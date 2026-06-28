@@ -136,7 +136,7 @@ function Hero() {
             </h1>
 
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Automate repetitive work. Connect your business systems. Scale your operations with intelligent workflows built around your business.
+              I design and engineer the automated systems, integrations, and AI workflows that growing businesses rely on to scale operations without scaling headcount.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -281,7 +281,7 @@ function Challenges() {
       id="challenges"
       eyebrow="Business Challenges"
       title={<>The hidden tax on <span className="text-gradient-crimson">every growing business.</span></>}
-      subtitle="Growing businesses shouldn't be slowed down by repetitive work, disconnected software, or inefficient operations."
+      subtitle="Growing businesses shouldn't be slowed down by repetitive work, disconnected software, or operations that can't keep pace."
     >
       <div className="grid gap-6 md:grid-cols-3">
         {items.map((i) => <FeatureCard key={i.title} {...i} />)}
@@ -294,19 +294,19 @@ function Challenges() {
 
 function Solutions() {
   const items = [
-    { icon: Workflow, title: "Automation", body: "Eliminate hours of repetitive work. Free your team to focus on revenue, clients, and growth — not admin." },
-    { icon: Plug, title: "Integrations", body: "Connect your CRM, billing, support, and operations into one system that moves data automatically." },
-    { icon: Bot, title: "AI Systems", body: "Deploy AI agents that qualify leads, answer questions, summarize calls, and run inside your business 24/7." },
-    { icon: BarChart3, title: "Business Intelligence", body: "Turn operational data into decisions. Real metrics, real-time, surfaced where your team already works." },
-    { icon: LineChart, title: "Dashboards", body: "Single source of truth for your operations. Pipeline, performance, and bottlenecks visible at a glance." },
-    { icon: GitBranch, title: "Workflow Optimization", body: "Map, refine, and rebuild the processes that quietly cost you money. Less friction, more output." },
+    { icon: Workflow, title: "Automation", body: "Reclaim hours every week by replacing repetitive operational work with reliable, always-on systems." },
+    { icon: Plug, title: "Systems Integration", body: "Connect CRMs, billing, support, and operations so data moves automatically — without your team as the middleware." },
+    { icon: Bot, title: "AI Systems", body: "Deploy intelligent agents that qualify, respond, summarize, and run inside the business around the clock." },
+    { icon: BarChart3, title: "Business Intelligence", body: "Turn operational data into decisions your team can act on the moment they need it." },
+    { icon: LineChart, title: "Dashboards", body: "A single source of truth for pipeline, performance, and bottlenecks — visible at a glance." },
+    { icon: GitBranch, title: "Workflow Optimization", body: "Map, refine, and rebuild the processes quietly draining margin so the business runs cleaner at scale." },
   ];
   return (
     <Section
       id="solutions"
       eyebrow="Solution Framework"
       title={<>Systems designed around <span className="text-gradient-crimson">business outcomes.</span></>}
-      subtitle="We don't sell technology. We deliver measurable improvements to how your business runs."
+      subtitle="I don't sell technology. I deliver measurable improvements to how your business runs."
     >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {items.map((i) => <FeatureCard key={i.title} {...i} />)}
@@ -319,17 +319,17 @@ function Solutions() {
 
 function Process() {
   const steps = [
-    { n: "01", icon: Search, title: "Discover", body: "We map your operations, surface bottlenecks, and identify where automation creates real ROI." },
-    { n: "02", icon: PenTool, title: "Design", body: "We architect scalable workflows tailored to how your business actually runs today and tomorrow." },
-    { n: "03", icon: Hammer, title: "Build", body: "We develop automations, integrations, AI agents, and dashboards — production-grade from day one." },
-    { n: "04", icon: Activity, title: "Optimize", body: "We monitor, refine, and continuously improve so your systems get smarter the longer they run." },
+    { n: "01", icon: Search, title: "Discover", body: "I map your operations, surface bottlenecks, and identify where engineering creates real ROI." },
+    { n: "02", icon: PenTool, title: "Design", body: "I architect scalable workflows tailored to how your business actually runs today and tomorrow." },
+    { n: "03", icon: Hammer, title: "Build", body: "I develop the automations, integrations, AI systems, and dashboards — production-grade from day one." },
+    { n: "04", icon: Activity, title: "Optimize", body: "I monitor, refine, and continuously improve so your systems get sharper the longer they run." },
   ];
   return (
     <Section
       id="process"
-      eyebrow="Our Process"
+      eyebrow="My Process"
       title={<>A disciplined path from <span className="text-gradient-crimson">chaos to clarity.</span></>}
-      subtitle="Every engagement follows the same proven framework — built for speed, transparency, and lasting results."
+      subtitle="Every engagement follows the same engineering discipline — structured, repeatable, and built for lasting results."
     >
       <div className="group/timeline relative">
         {/* Connecting path — sits behind cards, subtle crimson gradient + soft glow */}
