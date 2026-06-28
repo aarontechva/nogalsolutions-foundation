@@ -40,7 +40,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div id="top" className="min-h-screen bg-background text-foreground">
+    <div id="top" className="relative min-h-screen text-foreground">
+      <SiteBackground />
       <Navbar />
       <Hero />
       <Challenges />
@@ -54,28 +55,59 @@ function Index() {
   );
 }
 
+/* ───────────────────── SITE BACKGROUND ─────────────────────
+ * Premium, minimal ambient backdrop inspired by Apple keynote
+ * wallpapers: deep charcoal base, soft crimson radial glows,
+ * vignette for focus, and faint grain to prevent banding.
+ */
+function SiteBackground() {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* Base */}
+      <div className="absolute inset-0 bg-[#050505]" />
+      {/* Crimson ambient glows — large, soft, off-center */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.40 0.16 18 / 0.55), transparent 62%)," +
+            "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.28 0.11 18 / 0.38), transparent 68%)," +
+            "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.32 0.14 18 / 0.42), transparent 62%)," +
+            "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.26 0.10 18 / 0.30), transparent 70%)",
+        }}
+      />
+      {/* Vignette */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 110% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+        }}
+      />
+      {/* Grain */}
+      <div
+        className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+        }}
+      />
+    </div>
+  );
+}
+
 /* ─────────────────────────── HERO ─────────────────────────── */
 
 function Hero() {
   return (
     <section className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
-      {/* Background glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{ background: "var(--gradient-hero)" }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-[0.04]" style={{
+      {/* Subtle grid — focused at the top, fades quickly */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035]" style={{
         backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-        backgroundSize: "60px 60px",
-        maskImage: "radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%)",
+        backgroundSize: "72px 72px",
+        maskImage: "radial-gradient(ellipse at 50% 0%, black 20%, transparent 65%)",
+        WebkitMaskImage: "radial-gradient(ellipse at 50% 0%, black 20%, transparent 65%)",
       }} />
-
-      {/* Bottom fade into the next section */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-background to-transparent"
-      />
 
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
