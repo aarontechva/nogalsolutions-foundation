@@ -9,21 +9,22 @@ export function Footer() {
               <span className="text-base font-semibold tracking-tight">NogalSolutions</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-              AI-powered automation & systems integration studio. Built for businesses that are ready to scale.
+              AI-powered systems engineering studio helping businesses automate operations, integrate software, and build scalable workflows.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 text-sm md:grid-cols-3">
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Explore</p>
               <ul className="space-y-2">
-                <li><a href="#challenges" className="text-foreground/80 hover:text-primary">Challenges</a></li>
                 <li><a href="#solutions" className="text-foreground/80 hover:text-primary">Solutions</a></li>
                 <li><a href="#process" className="text-foreground/80 hover:text-primary">Process</a></li>
+                <li><a href="#proof" className="text-foreground/80 hover:text-primary">Proof of Work</a></li>
               </ul>
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Company</p>
               <ul className="space-y-2">
+                <li><a href="#stack" className="text-foreground/80 hover:text-primary">Technology</a></li>
                 <li><a href="#about" className="text-foreground/80 hover:text-primary">About</a></li>
                 <li><a href="#cta" className="text-foreground/80 hover:text-primary">Contact</a></li>
               </ul>

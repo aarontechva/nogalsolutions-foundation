@@ -5,8 +5,10 @@ const nav = [
   { href: "#challenges", label: "Challenges" },
   { href: "#solutions", label: "Solutions" },
   { href: "#process", label: "Process" },
-  { href: "#stack", label: "Stack" },
+  { href: "#why", label: "Why Choose" },
+  { href: "#stack", label: "Technology" },
   { href: "#about", label: "About" },
+  { href: "#cta", label: "Contact" },
 ];
 
 export function Navbar() {
