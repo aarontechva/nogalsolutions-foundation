@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import founderImg from "@/assets/founder.jpg";
+import founderImg from "@/assets/aaron.jpg.asset.json";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Section } from "@/components/site/Section";
@@ -135,7 +135,7 @@ function Hero() {
                 }}
               />
               <img
-                src={founderImg}
+                src={founderImg.url}
                 alt="Aaron Nogal, Founder of NogalSolutions"
                 width={1024}
                 height={1280}
@@ -359,7 +359,7 @@ function About() {
       <div className="grid items-center gap-14 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-border/80 shadow-elegant">
-            <img src={founderImg} alt="Aaron Nogal" loading="lazy" width={1024} height={1280} className="size-full object-cover" />
+            <img src={founderImg.url} alt="Aaron Nogal" loading="lazy" width={1024} height={1280} className="size-full object-cover" />
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 50%, oklch(0 0 0 / 0.6) 100%)" }} />
           </div>
         </div>
