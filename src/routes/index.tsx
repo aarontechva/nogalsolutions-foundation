@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import founderImg from "@/assets/founder.jpg";
+import founderImg from "@/assets/aaron.jpg.asset.json";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Section } from "@/components/site/Section";
