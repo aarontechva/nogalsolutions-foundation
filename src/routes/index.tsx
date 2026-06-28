@@ -322,11 +322,44 @@ function Process() {
       title={<>A disciplined path from <span className="text-gradient-crimson">chaos to clarity.</span></>}
       subtitle="Every engagement follows the same proven framework — built for speed, transparency, and lasting results."
     >
-      <div className="relative">
-        <div aria-hidden className="absolute left-0 right-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block" />
-        <div className="grid gap-8 md:grid-cols-4 md:gap-6">
-          {steps.map((s) => (
-            <div key={s.n} className="relative">
+      <div className="group/timeline relative">
+        {/* Connecting path — sits behind cards, subtle crimson gradient + soft glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-0 right-0 top-12 z-0 hidden h-[2px] md:block"
+          style={{
+            background:
+              "linear-gradient(to right, transparent 0%, oklch(0.45 0.16 18 / 0.55) 18%, oklch(0.55 0.18 18 / 0.7) 50%, oklch(0.45 0.16 18 / 0.55) 82%, transparent 100%)",
+            boxShadow:
+              "0 0 12px oklch(0.55 0.18 18 / 0.35), 0 0 24px oklch(0.45 0.16 18 / 0.18)",
+          }}
+        />
+        <div className="relative z-10 grid gap-8 md:grid-cols-4 md:gap-6">
+          {steps.map((s, i) => (
+            <div key={s.n} className="group/step relative">
+              {/* Hover-illuminated segments (incoming + outgoing) */}
+              {i > 0 && (
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute right-1/2 top-12 hidden h-[2px] w-1/2 opacity-0 transition-opacity duration-300 ease-out group-hover/step:opacity-100 md:block"
+                  style={{
+                    background:
+                      "linear-gradient(to right, transparent, oklch(0.62 0.20 18 / 0.95))",
+                    boxShadow: "0 0 16px oklch(0.62 0.20 18 / 0.6)",
+                  }}
+                />
+              )}
+              {i < steps.length - 1 && (
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-12 hidden h-[2px] w-1/2 opacity-0 transition-opacity duration-300 ease-out group-hover/step:opacity-100 md:block"
+                  style={{
+                    background:
+                      "linear-gradient(to right, oklch(0.62 0.20 18 / 0.95), transparent)",
+                    boxShadow: "0 0 16px oklch(0.62 0.20 18 / 0.6)",
+                  }}
+                />
+              )}
               <div className="relative z-10 mb-6 inline-grid size-24 place-items-center rounded-2xl border border-border/80 bg-card shadow-card">
                 <div
                   aria-hidden
@@ -334,7 +367,13 @@ function Process() {
                   style={{ background: "var(--gradient-crimson)" }}
                 />
                 <s.icon className="relative size-7 text-primary" />
-                <span className="absolute -right-2 -top-2 grid size-7 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-glow">
+                <span
+                  className="absolute -right-2 -top-2 grid size-7 place-items-center rounded-full text-[10px] font-bold text-primary-foreground shadow-glow ring-1 ring-white/15"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, oklch(0.62 0.22 18) 0%, oklch(0.48 0.20 18) 100%)",
+                  }}
+                >
                   {s.n}
                 </span>
               </div>
@@ -440,14 +479,45 @@ function CTA() {
   return (
     <section id="cta" className="relative py-24 lg:py-32">
       <Container>
-        <div className="relative overflow-hidden rounded-3xl border border-primary/30 p-10 shadow-elegant md:p-16 lg:p-20"
-          style={{ background: "var(--gradient-crimson)" }}
+        <div
+          className="relative overflow-hidden rounded-3xl border border-primary/20 p-10 shadow-elegant md:p-16 lg:p-20"
+          style={{
+            background:
+              "linear-gradient(135deg, #12090B 0%, #4A0813 45%, #7A1022 65%, #4A0813 85%, #12090B 100%)",
+          }}
         >
-          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{
-            backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }} />
-          <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 size-[500px] rounded-full bg-white/10 blur-3xl" />
+          {/* Grid */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+              backgroundSize: "44px 44px",
+              maskImage:
+                "radial-gradient(ellipse 80% 70% at 30% 40%, black 30%, transparent 85%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 80% 70% at 30% 40%, black 30%, transparent 85%)",
+            }}
+          />
+          {/* Soft radial highlight behind heading */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 55% 60% at 22% 32%, oklch(0.45 0.16 18 / 0.45), transparent 65%)",
+            }}
+          />
+          {/* Vignette */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 100% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+            }}
+          />
           <div className="relative max-w-3xl">
             <h2 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-primary-foreground md:text-6xl">
               Ready to build systems that scale with your business?
