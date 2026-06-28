@@ -399,36 +399,37 @@ function Process() {
 /* ───────────────────── TECH STACK ───────────────────── */
 
 function TechStack() {
-  const items = [
-    { icon: Workflow, name: "n8n", body: "Open-source automation engine for complex multi-step workflows." },
-    { icon: Layers, name: "GoHighLevel", body: "All-in-one CRM, marketing, and pipeline automation platform." },
-    { icon: Zap, name: "Zapier", body: "Rapid integration for thousands of apps in production-grade flows." },
-    { icon: Plug, name: "REST APIs", body: "Custom connections between any modern software — no limits." },
-    { icon: Bot, name: "AI Agents", body: "Autonomous assistants that handle tasks, conversations, and decisions." },
-    { icon: Database, name: "SQL", body: "Reliable, performant data foundations behind every system we ship." },
-    { icon: Boxes, name: "Databases", body: "Postgres, Supabase, and managed stores designed to scale with you." },
-    { icon: Layers, name: "CRMs", body: "HubSpot, Salesforce, GHL — extended and integrated to fit your workflow." },
-    { icon: Cloud, name: "Cloud", body: "Modern cloud infrastructure: secure, observable, deployed in days." },
-    { icon: Sparkles, name: "OpenAI", body: "GPT-class intelligence embedded directly into your operations." },
-    { icon: Cpu, name: "Claude", body: "Long-context reasoning for documents, research, and complex automations." },
-    { icon: BarChart3, name: "Analytics", body: "Metabase, Looker, and custom dashboards for real operational visibility." },
+  const groups = [
+    { icon: Workflow, name: "Workflow Automation", tools: ["n8n", "Zapier", "Make", "Webhooks"] },
+    { icon: Layers, name: "CRM Ecosystems", tools: ["GoHighLevel", "HubSpot", "Custom CRM"] },
+    { icon: Bot, name: "AI Platforms", tools: ["OpenAI", "Claude", "AI Agents", "RAG", "MCP"] },
+    { icon: Plug, name: "Backend Integrations", tools: ["REST APIs", "GraphQL", "OAuth", "HTTP"] },
+    { icon: Database, name: "Data Engineering", tools: ["SQL", "PostgreSQL", "Supabase", "Google Sheets"] },
+    { icon: Cloud, name: "Cloud Infrastructure", tools: ["Docker", "Linux", "Hostinger VPS", "DigitalOcean"] },
+    { icon: Cpu, name: "Frontend Applications", tools: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
+    { icon: BarChart3, name: "Business Intelligence", tools: ["Dashboards", "Analytics", "Reporting"] },
+    { icon: Boxes, name: "System Architecture", tools: ["Solution Architecture", "Workflow Design", "Process Mapping", "Integration Architecture"] },
   ];
   return (
     <Section
       id="stack"
       eyebrow="Technology Stack"
-      title={<>Best-in-class tools, <span className="text-gradient-crimson">orchestrated for you.</span></>}
-      subtitle="Technology is never the product. These are the instruments we use to build systems that deliver business outcomes."
+      title={<>The implementation layer, <span className="text-gradient-crimson">not the product.</span></>}
+      subtitle="Technology is the supporting evidence — chosen and combined to fit the business, never the other way around."
     >
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {items.map((t) => (
-          <div key={t.name} className="group flex items-start gap-4 rounded-xl border border-border/80 bg-card/60 p-5 transition-all hover:border-primary/40 hover:bg-card">
-            <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-              <t.icon className="size-5" />
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {groups.map((g) => (
+          <div key={g.name} className="group rounded-2xl border border-border/80 bg-card/60 p-6 transition-all hover:border-primary/40 hover:bg-card">
+            <div className="flex items-center gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <g.icon className="size-5" />
+              </div>
+              <p className="text-sm font-semibold tracking-tight">{g.name}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold">{t.name}</p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t.body}</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {g.tools.map((t) => (
+                <span key={t} className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80">{t}</span>
+              ))}
             </div>
           </div>
         ))}
@@ -454,29 +455,89 @@ function About() {
             <span className="size-1.5 rounded-full bg-primary" /> About
           </div>
           <h2 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
-            Built by an engineer who understands <span className="text-gradient-crimson">business systems.</span>
+            An engineer who thinks in <span className="text-gradient-crimson">business systems.</span>
           </h2>
           <div className="mt-7 space-y-5 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Aaron Nogal specializes in automation architecture, systems integration, AI-powered workflows, and operational optimization.
+              I'm Aaron Nogal — a systems engineer focused on architecture-first automation, integrations, and AI systems that hold up in production.
             </p>
             <p>
-              The focus is helping businesses scale — not selling technology. Every project is judged by one standard: does it create measurable, lasting business outcomes?
+              Every project is measured by one standard: did it create a measurable, lasting business outcome?
             </p>
           </div>
-          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
-              { k: "Systems Engineering", v: "Architecture-first" },
-              { k: "Automation", v: "Production-grade" },
-              { k: "AI Integration", v: "Outcome-driven" },
+              { v: "Architecture-first" },
+              { v: "Production-grade" },
+              { v: "Outcome-driven" },
             ].map((p) => (
-              <div key={p.k} className="rounded-xl border border-border/80 bg-card p-4">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">{p.k}</p>
-                <p className="mt-1 text-sm font-semibold">{p.v}</p>
+              <div key={p.v} className="rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-3 text-center">
+                <p className="text-sm font-semibold tracking-tight text-foreground">{p.v}</p>
               </div>
             ))}
           </div>
         </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ───────────────────── WHY CHOOSE ───────────────────── */
+
+function WhyChoose() {
+  const items = [
+    { icon: Compass, title: "Architecture-First", body: "Every solution begins with understanding how your business operates before selecting any technology." },
+    { icon: Target, title: "Business Outcomes", body: "Every project is measured by operational improvements, not by the number of automations delivered." },
+    { icon: ShieldCheck, title: "Production-Grade Systems", body: "I build reliable systems designed for real businesses — not prototypes that fall over under load." },
+    { icon: Scaling, title: "Scalable Foundations", body: "Workflows are built to keep supporting growth as the business expands, without constant rework." },
+    { icon: Handshake, title: "Transparent Collaboration", body: "You'll work directly with the engineer designing and building your systems — no account layers." },
+    { icon: InfinityIcon, title: "Long-Term Thinking", body: "Systems are designed to remain maintainable, not to create technical debt you inherit later." },
+  ];
+  return (
+    <Section
+      id="why"
+      eyebrow="Why NogalSolutions"
+      title={<>Why businesses choose <span className="text-gradient-crimson">NogalSolutions.</span></>}
+      subtitle="Technology is easy to buy. Engineering systems that actually improve a business is much harder."
+    >
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((i) => <FeatureCard key={i.title} {...i} />)}
+      </div>
+    </Section>
+  );
+}
+
+/* ───────────────────── PROOF OF WORK ───────────────────── */
+
+function ProofOfWork() {
+  const items = [
+    { title: "AI-Assisted Pre-Sales Operations", body: "Lead qualification, enrichment, and intelligent routing — engineered end-to-end." },
+    { title: "AI-Assisted Post-Sales Operations", body: "Onboarding, follow-up, and retention workflows that run reliably in the background." },
+    { title: "Business Operations Dashboard", body: "A unified view of pipeline, performance, and operational health — built on live data." },
+  ];
+  return (
+    <Section
+      id="proof"
+      eyebrow="Proof of Work"
+      title={<>Real systems. <span className="text-gradient-crimson">Real outcomes.</span></>}
+      subtitle="A closer look at production systems engineered for live business operations."
+    >
+      <div className="grid gap-6 md:grid-cols-3">
+        {items.map((p) => (
+          <div key={p.title} className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-7 shadow-card">
+            <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{
+              background: "radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.30 0.12 18 / 0.18), transparent 70%)",
+            }} />
+            <div className="relative">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-primary">
+                <Clock className="size-3" /> Launching Soon
+              </div>
+              <h3 className="text-lg font-semibold tracking-tight">{p.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
+              <div className="mt-6 h-32 rounded-xl border border-dashed border-border/60 bg-secondary/30" />
+            </div>
+          </div>
+        ))}
       </div>
     </Section>
   );
@@ -492,7 +553,7 @@ function CTA() {
           className="relative overflow-hidden rounded-3xl border border-primary/20 p-10 shadow-elegant md:p-16 lg:p-20"
           style={{
             background:
-              "linear-gradient(135deg, #12090B 0%, #4A0813 45%, #7A1022 65%, #4A0813 85%, #12090B 100%)",
+              "linear-gradient(135deg, #0B0608 0%, #2A0710 45%, #45101C 65%, #2A0710 85%, #0B0608 100%)",
           }}
         >
           {/* Grid */}
@@ -532,7 +593,7 @@ function CTA() {
               Ready to build systems that scale with your business?
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary-foreground/85 md:text-xl">
-              Tell us where your operations break down. We'll design and build the automations, integrations, and AI systems that fix it — for good.
+              Tell me where your operations break down. I'll design and build the automations, integrations, and AI systems that fix it — for good.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
