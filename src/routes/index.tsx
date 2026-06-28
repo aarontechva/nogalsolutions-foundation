@@ -24,6 +24,13 @@ import {
   PenTool,
   Hammer,
   Activity,
+  Compass,
+  Target,
+  ShieldCheck,
+  Scaling,
+  Handshake,
+  Infinity as InfinityIcon,
+  Clock,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -47,8 +54,10 @@ function Index() {
       <Challenges />
       <Solutions />
       <Process />
+      <WhyChoose />
       <TechStack />
       <About />
+      <ProofOfWork />
       <CTA />
       <Footer />
     </div>
@@ -70,10 +79,10 @@ function SiteBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.40 0.16 18 / 0.55), transparent 62%)," +
-            "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.28 0.11 18 / 0.38), transparent 68%)," +
-            "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.32 0.14 18 / 0.42), transparent 62%)," +
-            "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.26 0.10 18 / 0.30), transparent 70%)",
+            "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.32 0.12 18 / 0.55), transparent 62%)," +
+            "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.22 0.09 18 / 0.38), transparent 68%)," +
+            "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.26 0.11 18 / 0.42), transparent 62%)," +
+            "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.20 0.08 18 / 0.30), transparent 70%)",
         }}
       />
       {/* Vignette */}
