@@ -135,7 +135,7 @@ function Hero() {
                 }}
               />
               <img
-                src={founderImg}
+                src={founderImg.url}
                 alt="Aaron Nogal, Founder of NogalSolutions"
                 width={1024}
                 height={1280}
