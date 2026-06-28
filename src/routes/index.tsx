@@ -71,6 +71,12 @@ function Hero() {
         maskImage: "radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%)",
       }} />
 
+      {/* Bottom fade into the next section */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-background to-transparent"
+      />
+
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           {/* Left */}
