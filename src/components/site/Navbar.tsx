@@ -5,7 +5,7 @@ const nav = [
   { href: "#challenges", label: "Challenges" },
   { href: "#solutions", label: "Solutions" },
   { href: "#process", label: "Process" },
-  { href: "#why", label: "Why Choose" },
+  { href: "#why", label: "My Edge" },
   { href: "#stack", label: "Technology" },
   { href: "#about", label: "About" },
   { href: "#cta", label: "Contact" },

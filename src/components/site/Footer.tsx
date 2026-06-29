@@ -34,7 +34,7 @@ export function Footer() {
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Get in touch</p>
               <div className="flex flex-col gap-3">
-                <a href="#cta" className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                <a href="#cta" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
                   Book a call →
                 </a>
                 <div className="flex flex-wrap gap-3">

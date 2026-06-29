@@ -445,7 +445,7 @@ function About() {
       <div className="grid items-center gap-14 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-border/80 shadow-elegant">
-            <img src="/aaron.jpg" alt="Aaron Nogal" loading="lazy" width={1024} height={1280} className="size-full object-cover object-[center_25%]" />
+            <img src="/nogalsolutions-blackcharcoal-profile-image.png" alt="Aaron Nogal" loading="lazy" width={1024} height={1280} className="size-full object-cover object-[center_30%]" />
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 50%, oklch(0 0 0 / 0.6) 100%)" }} />
           </div>
         </div>
@@ -496,7 +496,12 @@ function WhyChoose() {
     <Section
       id="why"
       eyebrow="Why NogalSolutions"
-      title={<>Why businesses choose <span className="text-gradient-crimson">NogalSolutions.</span></>}
+      title={(
+        <>
+          <span className="block">The framework behind</span>
+          <span className="mt-3 block text-gradient-crimson">high-performing operations.</span>
+        </>
+      )}
       subtitle="Technology is easy to buy. Engineering systems that actually improve a business is much harder."
     >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
