@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 export function Footer() {
   return (
     <footer className="border-t border-border/60 bg-background">
@@ -31,9 +33,19 @@ export function Footer() {
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Get in touch</p>
-              <a href="#cta" className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
-                Book a call →
-              </a>
+              <div className="flex flex-col gap-3">
+                <a href="#cta" className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                  Book a call →
+                </a>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild variant="secondary" size="default">
+                    <a href="https://www.linkedin.com/in/aaron-nogal" target="_blank" rel="noreferrer">LinkedIn</a>
+                  </Button>
+                  <Button asChild variant="secondary" size="default">
+                    <a href="https://www.upwork.com/freelancers/~015a9f13d7c1fce814?mp_source=share" target="_blank" rel="noreferrer">Upwork</a>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
