@@ -70,29 +70,41 @@ function Index() {
  */
 function SiteBackground() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      {/* Base */}
-      <div className="absolute inset-0 bg-[#050505]" />
-      {/* Crimson ambient glows — large, soft, off-center */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.32 0.12 18 / 0.55), transparent 62%)," +
-            "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.22 0.09 18 / 0.38), transparent 68%)," +
-            "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.26 0.11 18 / 0.42), transparent 62%)," +
-            "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.20 0.08 18 / 0.30), transparent 70%)",
-        }}
-      />
-      {/* Vignette */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 110% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
-        }}
-      />
-      {/* Grain */}
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background">
+      {/* Light mode: soft, mostly-white backdrop with faint crimson glows */}
+      <div className="absolute inset-0 dark:hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.85 0.06 18 / 0.5), transparent 62%)," +
+              "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.9 0.04 18 / 0.35), transparent 68%)," +
+              "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.88 0.05 18 / 0.4), transparent 62%)",
+          }}
+        />
+      </div>
+      {/* Dark mode: deep charcoal base with crimson ambient glows + vignette */}
+      <div className="absolute inset-0 hidden dark:block">
+        <div className="absolute inset-0 bg-[#050505]" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.32 0.12 18 / 0.55), transparent 62%)," +
+              "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.22 0.09 18 / 0.38), transparent 68%)," +
+              "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.26 0.11 18 / 0.42), transparent 62%)," +
+              "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.20 0.08 18 / 0.30), transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 110% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+          }}
+        />
+      </div>
+      {/* Grain — subtle on both themes via blend mode */}
       <div
         className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
         style={{
@@ -111,7 +123,7 @@ function Hero() {
     <section className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
       {/* Subtle grid — focused at the top, fades quickly */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035]" style={{
-        backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)",
         backgroundSize: "72px 72px",
         maskImage: "radial-gradient(ellipse at 50% 0%, black 20%, transparent 65%)",
         WebkitMaskImage: "radial-gradient(ellipse at 50% 0%, black 20%, transparent 65%)",
@@ -194,8 +206,10 @@ function Hero() {
                       <Sparkles className="size-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Aaron Nogal</p>
-                      <p className="text-xs text-muted-foreground">Founder & Systems Engineer</p>
+                      {/* Hardcoded white, not theme tokens — sits on the portrait photo itself,
+                          which keeps its own dark/crimson backdrop regardless of site theme. */}
+                      <p className="text-sm font-semibold text-white">Aaron Nogal</p>
+                      <p className="text-xs text-white/70">Founder & Systems Engineer</p>
                     </div>
                   </div>
                 </div>
@@ -208,7 +222,9 @@ function Hero() {
                 <Zap className="size-4 text-primary" /> Workflows live in 4 weeks
               </div>
             </div>
-            <div className="absolute -right-4 bottom-24 hidden rounded-2xl border border-border/80 bg-card/90 p-3 shadow-card backdrop-blur md:flex">
+            {/* bottom-36 is a hardcoded offset bump (was bottom-24) so this badge clears the
+                name/title overlay card pinned to the bottom of the portrait. */}
+            <div className="absolute -right-4 bottom-36 hidden rounded-2xl border border-border/80 bg-card/90 p-3 shadow-card backdrop-blur md:flex">
               <div className="flex items-center gap-2 px-2 text-xs">
                 <Activity className="size-4 text-primary" /> Always-on monitoring
               </div>
@@ -600,9 +616,12 @@ function CTA() {
               Tell me where your operations break down. I'll design and build the automations, integrations, and AI systems that fix it — for good.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
+              {/* Fixed white pill, not theme tokens — this panel's background is a hardcoded
+                  dark gradient in both light and dark mode, so bg-background/text-foreground
+                  would invert to a near-invisible dark-on-dark button in dark mode. */}
               <a
                 href="#"
-                className="group inline-flex items-center gap-2 rounded-xl bg-background px-6 py-3.5 text-base font-medium text-foreground shadow-card transition-all hover:translate-y-[-1px]"
+                className="group inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-medium text-black shadow-card transition-all hover:translate-y-[-1px] hover:bg-white/90"
               >
                 Start a Project
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />

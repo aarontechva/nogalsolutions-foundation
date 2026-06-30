@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/lib/theme";
 
 const nav = [
   { href: "#challenges", label: "Challenges" },
@@ -13,6 +15,7 @@ const nav = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -38,10 +41,20 @@ export function Navbar() {
               </a>
             ))}
           </nav>
-          <a href="#cta" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
-            Start a Project
-            <span aria-hidden>→</span>
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              className="grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
+            <a href="#cta" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
+              Start a Project
+              <span aria-hidden>→</span>
+            </a>
+          </div>
         </div>
       </div>
     </header>
