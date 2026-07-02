@@ -10,7 +10,7 @@ const nav = [
   { href: "#why", label: "My Edge" },
   { href: "#stack", label: "Technology" },
   { href: "#about", label: "About" },
-  { href: "#cta", label: "Contact" },
+  { href: "#intake", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -50,7 +50,7 @@ export function Navbar() {
             >
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
-            <a href="#cta" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
+            <a href="#intake" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
               Start a Project
               <span aria-hidden>→</span>
             </a>

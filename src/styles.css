@@ -155,6 +155,23 @@
     border-color: var(--color-border);
   }
 
+  *, *::before, *::after {
+    transition: background-color 200ms ease;
+  }
+
+  .glass-panel,
+  [class*="backdrop-blur"],
+  svg,
+  svg * {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition: none;
+    }
+  }
+
   html {
     background-color: var(--background);
   }

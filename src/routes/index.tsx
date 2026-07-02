@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { IntakeForm } from "@/components/site/IntakeForm";
 import { Section } from "@/components/site/Section";
 import { Container } from "@/components/site/Container";
 import {
@@ -58,6 +59,7 @@ function Index() {
       <About />
       <ProofOfWork />
       <CTA />
+      <IntakeForm />
       <Footer />
     </div>
   );
@@ -152,7 +154,7 @@ function Hero() {
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
-                href="#cta"
+                href="#intake"
                 className="group inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-medium text-primary-foreground shadow-elegant transition-all hover:translate-y-[-1px] hover:bg-primary/90 hover:shadow-glow"
               >
                 Start a Project
@@ -613,24 +615,17 @@ function CTA() {
               Ready to build systems that scale with your business?
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary-foreground/85 md:text-xl">
-              Tell me where your operations break down. I'll design and build the automations, integrations, and AI systems that fix it — for good.
+              I'll design and build the automations, integrations, and AI systems that fix it — for good.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               {/* Fixed white pill, not theme tokens — this panel's background is a hardcoded
                   dark gradient in both light and dark mode, so bg-background/text-foreground
                   would invert to a near-invisible dark-on-dark button in dark mode. */}
               <a
-                href="#"
+                href="#intake"
                 className="group inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-medium text-black shadow-card transition-all hover:translate-y-[-1px] hover:bg-white/90"
               >
                 Start a Project
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
-              <a
-                href="#"
-                className="group inline-flex items-center gap-2 rounded-xl border border-primary-foreground/30 bg-primary-foreground/10 px-6 py-3.5 text-base font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/20"
-              >
-                Book Discovery Call
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>

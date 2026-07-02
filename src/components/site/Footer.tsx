@@ -28,14 +28,14 @@ export function Footer() {
               <ul className="space-y-2">
                 <li><a href="#stack" className="text-foreground/80 hover:text-primary">Technology</a></li>
                 <li><a href="#about" className="text-foreground/80 hover:text-primary">About</a></li>
-                <li><a href="#cta" className="text-foreground/80 hover:text-primary">Contact</a></li>
+                <li><a href="#intake" className="text-foreground/80 hover:text-primary">Contact</a></li>
               </ul>
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Get in touch</p>
               <div className="flex flex-col gap-3">
-                <a href="#cta" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
-                  Book a call →
+                <a href="#intake" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                  Start a Project →
                 </a>
                 <div className="flex flex-wrap gap-3">
                   <Button asChild variant="secondary" size="default">
