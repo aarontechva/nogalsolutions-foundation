@@ -168,6 +168,7 @@ export function IntakeForm() {
   const [fields, setFields] = useState<Fields>(INITIAL_FIELDS);
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const id = useId();
 
   const touch = (field: string) =>
@@ -211,18 +212,23 @@ export function IntakeForm() {
       consent: fields.consent,
       submitted_at: new Date().toISOString(),
     };
-    const { error } = await supabase.from("intake_submissions").insert({
-      payload,
-      submitted_at: payload.submitted_at,
-    });
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from("intake_submissions").insert({
+        payload,
+        submitted_at: payload.submitted_at,
+      });
 
-    if (error) {
-      console.error("[IntakeForm] Submission failed:", error);
-      // TODO: surface a user-facing error state — not in scope for this pass,
-      // flagging so it doesn't get forgotten before this goes to real users.
-      return;
+      if (error) {
+        console.error("[IntakeForm] Submission failed:", error);
+        // TODO: surface a user-facing error state — not in scope for this pass,
+        // flagging so it doesn't get forgotten before this goes to real users.
+        return;
+      }
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
     }
-    setSubmitted(true);
   }
 
   // ── SUCCESS STATE ────────────────────────────────────────────────────────────
@@ -519,15 +525,15 @@ export function IntakeForm() {
               </p>
               <button
                 type="submit"
-                disabled={!canSubmit}
+                disabled={!canSubmit || isSubmitting}
                 className={cn(
                   "group inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-medium text-primary-foreground shadow-elegant transition-all",
-                  canSubmit
+                  canSubmit && !isSubmitting
                     ? "hover:translate-y-[-1px] hover:bg-primary/90 hover:shadow-glow"
                     : "cursor-not-allowed opacity-40",
                 )}
               >
-                Submit
+                {isSubmitting ? "Submitting..." : "Submit"}
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>
