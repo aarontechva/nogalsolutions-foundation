@@ -1,0 +1,309 @@
+{
+  "id": "AK1GkD2TyT23hkXg",
+  "name": "NogalSolutions-Infra Backup Retention Purge (R2)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Daily 3:30am Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [208, 400]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "getAll",
+        "bucketName": "nogalsolutions-db-backups",
+        "returnAll": true,
+        "options": {
+          "folderKey": "backups/"
+        }
+      },
+      "id": "list-r2-objects",
+      "name": "List R2 Backup Objects",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [480, 480],
+      "credentials": {
+        "s3": { "id": "C0uGfhaUjFGAWpmc", "name": "Cloudflare R2 Backups" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst failed = items.length === 1 && items[0].json && items[0].json.error !== undefined;\n\nif (failed) {\n  const err = items[0].json.error;\n  return [{ json: { listError: true, errorMessage: typeof err === 'string' ? err : JSON.stringify(err) } }];\n}\n\nconst objects = items.map(i => i.json).filter(o => o && o.Key);\nreturn [{ json: { listError: false, objects, totalListed: objects.length } }];"
+      },
+      "id": "check-listing-result",
+      "name": "Check Listing Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 480]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "conditions": [
+            {
+              "id": "cond-list-error",
+              "leftValue": "={{ $json.listError }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-listing-failed",
+      "name": "Listing Failed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [960, 480]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn [{ json: { alertText: ':rotating_light: R2 backup retention purge FAILED at listing stage.\\nError: ' + data.errorMessage } }];"
+      },
+      "id": "format-list-error",
+      "name": "Format Listing Error Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 320]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $input.first().json;\nconst objects = data.objects;\nconst RETENTION_DAYS = 90;\nconst cutoff = new Date();\ncutoff.setUTCDate(cutoff.getUTCDate() - RETENTION_DAYS);\n\nconst KEY_DATE_RE = /^backups\\/(\\d{4}-\\d{2}-\\d{2})\\.json$/;\n\nconst toDelete = [];\nconst kept = [];\nconst unrecognized = [];\n\nfor (const obj of objects) {\n  const match = obj.Key.match(KEY_DATE_RE);\n  if (!match) {\n    unrecognized.push(obj.Key);\n    continue;\n  }\n  const keyDate = new Date(match[1] + 'T00:00:00Z');\n  if (keyDate < cutoff) {\n    toDelete.push(obj.Key);\n  } else {\n    kept.push(obj.Key);\n  }\n}\n\nreturn [{\n  json: {\n    totalListed: objects.length,\n    deleteCount: toDelete.length,\n    keptCount: kept.length,\n    unrecognizedCount: unrecognized.length,\n    unrecognizedKeys: unrecognized,\n    toDelete,\n    cutoffDate: cutoff.toISOString().slice(0, 10),\n    runTimestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "compute-objects-to-delete",
+      "name": "Compute Objects To Delete",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 560]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "conditions": [
+            {
+              "id": "cond-has-delete",
+              "leftValue": "={{ $json.deleteCount }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-any-to-delete",
+      "name": "Any Objects To Delete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1440, 560]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $input.first().json;\nreturn data.toDelete.map((key) => ({ json: { key } }));"
+      },
+      "id": "expand-delete-list",
+      "name": "Expand Delete List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1680, 460]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "delete",
+        "bucketName": "nogalsolutions-db-backups",
+        "fileKey": "={{ $json.key }}"
+      },
+      "id": "delete-r2-object",
+      "name": "Delete R2 Object",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [1920, 460],
+      "credentials": {
+        "s3": { "id": "C0uGfhaUjFGAWpmc", "name": "Cloudflare R2 Backups" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const results = $input.all();\nconst succeeded = results.filter(r => !(r.json && r.json.error));\nconst failed = results.filter(r => r.json && r.json.error);\nconst context = $('Compute Objects To Delete').first().json;\n\nreturn [{\n  json: {\n    totalListed: context.totalListed,\n    deleteAttempted: results.length,\n    deleteSucceeded: succeeded.length,\n    deleteFailed: failed.length,\n    failedKeys: failed.map((f, i) => (context.toDelete && context.toDelete[i]) || 'unknown'),\n    keptCount: context.keptCount,\n    unrecognizedCount: context.unrecognizedCount,\n    unrecognizedKeys: context.unrecognizedKeys,\n    cutoffDate: context.cutoffDate,\n    runTimestamp: context.runTimestamp\n  }\n}];"
+      },
+      "id": "collect-delete-results",
+      "name": "Collect Delete Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2160, 460]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const context = $input.first().json;\nreturn [{\n  json: {\n    totalListed: context.totalListed,\n    deleteAttempted: 0,\n    deleteSucceeded: 0,\n    deleteFailed: 0,\n    failedKeys: [],\n    keptCount: context.keptCount,\n    unrecognizedCount: context.unrecognizedCount,\n    unrecognizedKeys: context.unrecognizedKeys,\n    cutoffDate: context.cutoffDate,\n    runTimestamp: context.runTimestamp\n  }\n}];"
+      },
+      "id": "zero-deletions",
+      "name": "Zero Deletions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1680, 660]
+    },
+    {
+      "parameters": {
+        "numberInputs": 2
+      },
+      "id": "merge-branches",
+      "name": "Merge Delete Outcome",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [2400, 560]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const s = $input.first().json;\nconst summary = 'R2 backup retention purge: listed ' + s.totalListed + ', deleted ' + s.deleteSucceeded + '/' + s.deleteAttempted + ', kept ' + s.keptCount + ', unrecognized ' + s.unrecognizedCount + ', failed ' + s.deleteFailed + '. Cutoff ' + s.cutoffDate + '. Run at ' + s.runTimestamp + '.';\nreturn [{ json: { ...s, summary } }];"
+      },
+      "id": "log-purge-summary",
+      "name": "Log Purge Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2640, 560]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "conditions": [
+            {
+              "id": "cond-delete-failed",
+              "leftValue": "={{ $json.deleteFailed }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-delete-failures",
+      "name": "Any Delete Failures?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [2880, 560]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $input.first().json;\nreturn [{ json: { alertText: ':rotating_light: R2 backup retention purge: ' + s.deleteFailed + ' of ' + s.deleteAttempted + ' deletions FAILED.\\nFailed keys: ' + s.failedKeys.join(', ') } }];"
+      },
+      "id": "format-delete-error",
+      "name": "Format Delete Error Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3120, 440]
+    },
+    {
+      "parameters": {},
+      "id": "purge-complete",
+      "name": "Purge Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [3120, 660]
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "slack-alert",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [1440, 320],
+      "webhookId": "217de696-62d5-4884-801f-1ec482cff927",
+      "credentials": {
+        "slackApi": { "id": "ePXHcvTFYea6Cx5G", "name": "Slack account" }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 3:30am Trigger": {
+      "main": [[{ "node": "List R2 Backup Objects", "type": "main", "index": 0 }]]
+    },
+    "List R2 Backup Objects": {
+      "main": [[{ "node": "Check Listing Result", "type": "main", "index": 0 }]]
+    },
+    "Check Listing Result": {
+      "main": [[{ "node": "Listing Failed?", "type": "main", "index": 0 }]]
+    },
+    "Listing Failed?": {
+      "main": [
+        [{ "node": "Format Listing Error Alert", "type": "main", "index": 0 }],
+        [{ "node": "Compute Objects To Delete", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Listing Error Alert": {
+      "main": [[{ "node": "Send Slack Alert", "type": "main", "index": 0 }]]
+    },
+    "Compute Objects To Delete": {
+      "main": [[{ "node": "Any Objects To Delete?", "type": "main", "index": 0 }]]
+    },
+    "Any Objects To Delete?": {
+      "main": [
+        [{ "node": "Expand Delete List", "type": "main", "index": 0 }],
+        [{ "node": "Zero Deletions", "type": "main", "index": 0 }]
+      ]
+    },
+    "Expand Delete List": {
+      "main": [[{ "node": "Delete R2 Object", "type": "main", "index": 0 }]]
+    },
+    "Delete R2 Object": {
+      "main": [[{ "node": "Collect Delete Results", "type": "main", "index": 0 }]]
+    },
+    "Collect Delete Results": {
+      "main": [[{ "node": "Merge Delete Outcome", "type": "main", "index": 0 }]]
+    },
+    "Zero Deletions": {
+      "main": [[{ "node": "Merge Delete Outcome", "type": "main", "index": 1 }]]
+    },
+    "Merge Delete Outcome": {
+      "main": [[{ "node": "Log Purge Summary", "type": "main", "index": 0 }]]
+    },
+    "Log Purge Summary": {
+      "main": [[{ "node": "Any Delete Failures?", "type": "main", "index": 0 }]]
+    },
+    "Any Delete Failures?": {
+      "main": [
+        [{ "node": "Format Delete Error Alert", "type": "main", "index": 0 }],
+        [{ "node": "Purge Complete", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Delete Error Alert": {
+      "main": [[{ "node": "Send Slack Alert", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": { "node:Daily 3:30am Trigger": { "recurrenceRules": [] } },
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}
