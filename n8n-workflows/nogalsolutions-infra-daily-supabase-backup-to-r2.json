@@ -1,0 +1,581 @@
+{
+  "id": "7BK88P7WjHY8fdA5",
+  "name": "NogalSolutions-Infra Daily Supabase Backup to R2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      },
+      "id": "trigger-01",
+      "name": "Daily 3am Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [208, 800]
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/companies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-companies",
+      "name": "Fetch companies",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 80],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/prospects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-prospects",
+      "name": "Fetch prospects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 240],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/intake_submissions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-intake_submissions",
+      "name": "Fetch intake_submissions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 400],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/qualification_results",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-qualification_results",
+      "name": "Fetch qualification_results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 560],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/activity_logs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-activity_logs",
+      "name": "Fetch activity_logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 720],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/meetings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-meetings",
+      "name": "Fetch meetings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 880],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/discovery_sessions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-discovery_sessions",
+      "name": "Fetch discovery_sessions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 1040],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/post_call_analyses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-post_call_analyses",
+      "name": "Fetch post_call_analyses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 1200],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/deliverables",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-deliverables",
+      "name": "Fetch deliverables",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 1360],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/revision_loops",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "order", "value": "id.asc" },
+            { "name": "limit", "value": "1000" },
+            { "name": "offset", "value": "0" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json", "fullResponse": true }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [{ "name": "offset", "value": "={{ $pageCount * 1000 }}" }]
+              }
+            }
+          }
+        }
+      },
+      "id": "fetch-revision_loops",
+      "name": "Fetch revision_loops",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 1520],
+      "credentials": {
+        "httpCustomAuth": { "id": "EWkrK7GWLBdKg04s", "name": "Supabase Service Role (Custom Auth)" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 10
+      },
+      "id": "merge-all-tables",
+      "name": "Merge All Tables",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [800, 800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tables = ['companies','prospects','intake_submissions','qualification_results','activity_logs','meetings','discovery_sessions','post_call_analyses','deliverables','revision_loops'];\nconst nodeNameByTable = {\n  companies: 'Fetch companies',\n  prospects: 'Fetch prospects',\n  intake_submissions: 'Fetch intake_submissions',\n  qualification_results: 'Fetch qualification_results',\n  activity_logs: 'Fetch activity_logs',\n  meetings: 'Fetch meetings',\n  discovery_sessions: 'Fetch discovery_sessions',\n  post_call_analyses: 'Fetch post_call_analyses',\n  deliverables: 'Fetch deliverables',\n  revision_loops: 'Fetch revision_loops',\n};\n\nconst backup = {};\nconst errors = [];\n\nfor (const table of tables) {\n  const items = $(nodeNameByTable[table]).all();\n  const failedItem = items.find(i => i.json && i.json.error !== undefined);\n  if (failedItem) {\n    const errMsg = typeof failedItem.json.error === 'string' ? failedItem.json.error : JSON.stringify(failedItem.json.error);\n    errors.push({ table, error: errMsg });\n    backup[table] = null;\n  } else {\n    backup[table] = items.flatMap(i => Array.isArray(i.json.body) ? i.json.body : []);\n  }\n}\n\nconst backup_timestamp = new Date().toISOString();\n\nreturn [{\n  json: {\n    backup_timestamp,\n    hasErrors: errors.length > 0,\n    errors,\n    ...backup,\n  }\n}];"
+      },
+      "id": "combine-backup",
+      "name": "Combine Backup JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 800]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "conditions": [
+            {
+              "id": "cond-fetch-errors",
+              "leftValue": "={{ $json.hasErrors }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-fetch-errors",
+      "name": "Any Fetch Errors?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1280, 800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst lines = data.errors.map(e => '• ' + e.table + ': ' + e.error).join('\\n');\nreturn [{ json: { alertText: ':rotating_light: Daily Supabase backup FAILED at fetch stage (' + data.backup_timestamp + ')\\n' + lines } }];"
+      },
+      "id": "format-fetch-error",
+      "name": "Format Fetch Error Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 656]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst { hasErrors, errors, ...rest } = data;\nconst dateStr = rest.backup_timestamp.slice(0, 10);\nreturn [{ json: { fileName: 'backups/' + dateStr + '.json', fileContentString: JSON.stringify(rest, null, 2) } }];"
+      },
+      "id": "build-backup-file",
+      "name": "Build Backup File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 960]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "nogalsolutions-db-backups",
+        "fileName": "={{ $json.fileName }}",
+        "binaryData": false,
+        "fileContent": "={{ $json.fileContentString }}",
+        "additionalFields": {}
+      },
+      "id": "s3-upload",
+      "name": "Upload to R2",
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [1760, 960],
+      "credentials": {
+        "s3": { "id": "C0uGfhaUjFGAWpmc", "name": "Cloudflare R2 Backups" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 1 },
+          "conditions": [
+            {
+              "id": "cond-upload-error",
+              "leftValue": "={{ $json.error !== undefined && $json.error !== null }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-upload-failed",
+      "name": "Upload Failed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [2000, 960]
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);\nreturn [{ json: { alertText: ':rotating_light: Daily Supabase backup FAILED at R2 upload stage.\\nError: ' + msg } }];"
+      },
+      "id": "format-upload-error",
+      "name": "Format Upload Error Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2240, 1056]
+    },
+    {
+      "parameters": {},
+      "id": "backup-complete",
+      "name": "Backup Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2240, 864]
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "slack-alert",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [2000, 704],
+      "webhookId": "217de696-62d5-4884-801f-1ec482cff927",
+      "credentials": {
+        "slackApi": { "id": "ePXHcvTFYea6Cx5G", "name": "Slack account" }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 3am Trigger": {
+      "main": [[
+        { "node": "Fetch companies", "type": "main", "index": 0 },
+        { "node": "Fetch prospects", "type": "main", "index": 0 },
+        { "node": "Fetch intake_submissions", "type": "main", "index": 0 },
+        { "node": "Fetch qualification_results", "type": "main", "index": 0 },
+        { "node": "Fetch activity_logs", "type": "main", "index": 0 },
+        { "node": "Fetch meetings", "type": "main", "index": 0 },
+        { "node": "Fetch discovery_sessions", "type": "main", "index": 0 },
+        { "node": "Fetch post_call_analyses", "type": "main", "index": 0 },
+        { "node": "Fetch deliverables", "type": "main", "index": 0 },
+        { "node": "Fetch revision_loops", "type": "main", "index": 0 }
+      ]]
+    },
+    "Fetch companies": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 0 }]] },
+    "Fetch prospects": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 1 }]] },
+    "Fetch intake_submissions": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 2 }]] },
+    "Fetch qualification_results": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 3 }]] },
+    "Fetch activity_logs": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 4 }]] },
+    "Fetch meetings": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 5 }]] },
+    "Fetch discovery_sessions": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 6 }]] },
+    "Fetch post_call_analyses": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 7 }]] },
+    "Fetch deliverables": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 8 }]] },
+    "Fetch revision_loops": { "main": [[{ "node": "Merge All Tables", "type": "main", "index": 9 }]] },
+    "Merge All Tables": { "main": [[{ "node": "Combine Backup JSON", "type": "main", "index": 0 }]] },
+    "Combine Backup JSON": { "main": [[{ "node": "Any Fetch Errors?", "type": "main", "index": 0 }]] },
+    "Any Fetch Errors?": {
+      "main": [
+        [{ "node": "Format Fetch Error Alert", "type": "main", "index": 0 }],
+        [{ "node": "Build Backup File", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Fetch Error Alert": { "main": [[{ "node": "Send Slack Alert", "type": "main", "index": 0 }]] },
+    "Build Backup File": { "main": [[{ "node": "Upload to R2", "type": "main", "index": 0 }]] },
+    "Upload to R2": { "main": [[{ "node": "Upload Failed?", "type": "main", "index": 0 }]] },
+    "Upload Failed?": {
+      "main": [
+        [{ "node": "Format Upload Error Alert", "type": "main", "index": 0 }],
+        [{ "node": "Backup Complete", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Upload Error Alert": { "main": [[{ "node": "Send Slack Alert", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "staticData": { "node:Daily 3am Trigger": { "recurrenceRules": [] } },
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}

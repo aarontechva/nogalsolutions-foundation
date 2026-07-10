@@ -1,0 +1,56 @@
+{
+  "id": "6eSkKcomTnrzmY97",
+  "name": "NogalSolutions Keep-Alive — Supabase Ping",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "80889560-190e-4884-9b13-45153bdd4e2a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "activity_logs",
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [208, 0],
+      "id": "4eb38e72-baf3-4a4a-99bb-dd875eb6440c",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "GQFduIBGlLWbFt6n",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "Get many rows", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": { "node:Schedule Trigger": { "recurrenceRules": [190] } },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -1,0 +1,175 @@
+{
+  "id": "UTrJJvfGmAyvTYrL",
+  "name": "NogalSolutions Sub-Workflow: Resolve Prospect + Update Status",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "sw-node-01",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [240, 304]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/intake_submissions?id=eq.' + $json.intake_submission_id + '&select=prospect_id&limit=1' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "sw-node-02",
+      "name": "Resolve: Get Intake Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [496, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/prospects?id=eq.' + $('Resolve: Get Intake Submission').first().json.body[0].prospect_id + '&select=id,email,full_name,company_id&limit=1' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "sw-node-03",
+      "name": "Resolve: Get Prospect",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [752, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/prospects?id=eq.' + $('Resolve: Get Intake Submission').first().json.body[0].prospect_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ status: $('Execute Workflow Trigger').first().json.qualified ? 'qualified' : 'nurture' }) }}",
+        "options": {}
+      },
+      "id": "sw-node-04",
+      "name": "Update Prospect Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1008, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/activity_logs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ prospect_id: $('Resolve: Get Intake Submission').first().json.body[0].prospect_id, event_type: $('Execute Workflow Trigger').first().json.qualified ? 'prospect.qualified' : 'prospect.nurture', occurred_at: new Date().toISOString(), metadata: { from_status: 'new', to_status: $('Execute Workflow Trigger').first().json.qualified ? 'qualified' : 'nurture', rule_count: 7 } }) }}",
+        "options": {}
+      },
+      "id": "sw-node-05",
+      "name": "Log Activity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1264, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prospect = $('Resolve: Get Prospect').first().json.body[0];\nreturn [{ json: { id: prospect.id, email: prospect.email, full_name: prospect.full_name, company_id: prospect.company_id } }];"
+      },
+      "id": "sw-node-06",
+      "name": "Return Prospect",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 304]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [[{ "node": "Resolve: Get Intake Submission", "type": "main", "index": 0 }]]
+    },
+    "Resolve: Get Intake Submission": {
+      "main": [[{ "node": "Resolve: Get Prospect", "type": "main", "index": 0 }]]
+    },
+    "Resolve: Get Prospect": {
+      "main": [[{ "node": "Update Prospect Status", "type": "main", "index": 0 }]]
+    },
+    "Update Prospect Status": {
+      "main": [[{ "node": "Log Activity", "type": "main", "index": 0 }]]
+    },
+    "Log Activity": {
+      "main": [[{ "node": "Return Prospect", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}

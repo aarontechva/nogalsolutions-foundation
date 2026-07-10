@@ -1,0 +1,65 @@
+{
+  "id": "CwH1P7jBx9rcFFlG",
+  "name": "NogalSolutions-BW1 Auto-Ack Email — New Intake Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intake-submission-ack",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567891",
+      "name": "Intake Submission Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [256, 304],
+      "webhookId": "6f89507e-ab6e-4f53-b1b3-3b79ce08ab4c"
+    },
+    {
+      "parameters": {
+        "from": "aaron@nogalsolutions.tech",
+        "to": "={{ $json.body.record.payload.email }}",
+        "subject": "We received your inquiry",
+        "html": "<p>We received your inquiry and are reviewing. You will hear back within one business day.</p>",
+        "additionalOptions": {
+          "replyTo": "aaronnogal.va@gmail.com"
+        }
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678902",
+      "name": "Send Ack Email",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [512, 304],
+      "webhookId": "f5a6800d-0d83-40a3-a60d-036ccca00907",
+      "credentials": {
+        "resendApi": {
+          "id": "ENq3vMUDFXGwUrab",
+          "name": "Resend account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Intake Submission Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Ack Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

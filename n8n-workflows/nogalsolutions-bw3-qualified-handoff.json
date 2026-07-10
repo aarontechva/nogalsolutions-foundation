@@ -1,0 +1,361 @@
+{
+  "id": "37nvQYSYJ465uZTS",
+  "name": "NogalSolutions-BW3 Qualified Handoff",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "qualified-handoff",
+        "options": {}
+      },
+      "id": "bw3-node-01",
+      "name": "Qualified Handoff Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 304],
+      "webhookId": "47bb60f8-09b2-4619-a28b-d842fa111d04"
+    },
+    {
+      "parameters": {
+        "jsCode": "const record = $json.body.record;\nif (!record || !record.intake_submission_id) {\n  throw new Error('Missing intake_submission_id in webhook payload: ' + JSON.stringify($json));\n}\nreturn [{ json: { intake_submission_id: record.intake_submission_id, qualified: true } }];"
+      },
+      "id": "bw3-node-02",
+      "name": "Extract Submission ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [512, 304]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UTrJJvfGmAyvTYrL",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "bw3-node-03",
+      "name": "Call Sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [768, 304]
+    },
+    {
+      "parameters": {
+        "from": "aaron@nogalsolutions.tech",
+        "to": "={{ $('Call Sub-workflow').first().json.email }}",
+        "subject": "You qualify — book your discovery call",
+        "html": "={{ '<p>Hi ' + $('Call Sub-workflow').first().json.full_name + ',</p><p>Based on your submission, you are a strong fit for a discovery call. I would like to learn more about what you are working on.</p><p style=\"margin:24px 0\"><a href=\"https://calendly.com/aaronnogal-va/30min\" style=\"display:inline-block;padding:12px 24px;background:#000;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold\">Book Your 30-Minute Discovery Call</a></p><p>Talk soon.</p><p>Aaron<br>NogalSolutions</p>' }}",
+        "additionalOptions": {
+          "replyTo": "aaronnogal.va@gmail.com"
+        }
+      },
+      "id": "bw3-node-04",
+      "name": "Send Booking Email",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [1024, 304],
+      "webhookId": "be428872-d5e0-4228-b27c-0f91aef6a8b4",
+      "credentials": {
+        "resendApi": {
+          "id": "ENq3vMUDFXGwUrab",
+          "name": "Resend account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/companies?id=eq.' + $('Call Sub-workflow').first().json.company_id + '&select=id,name,website&limit=1' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "bw3-node-05",
+      "name": "Get Company from Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1280, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.hubapi.com/crm/v3/pipelines/deals",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "bw3-node-06",
+      "name": "Fetch HubSpot Pipeline Stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1552, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pipelinesResponse = $('Fetch HubSpot Pipeline Stages').first().json;\nconst pipelines = pipelinesResponse.results;\nlet pipelineId = null;\nlet stageId = null;\n\nfor (const pipeline of pipelines) {\n  for (const stage of pipeline.stages) {\n    if (stage.label.toLowerCase() === 'qualified') {\n      pipelineId = pipeline.id;\n      stageId = stage.id;\n      break;\n    }\n  }\n  if (stageId) break;\n}\n\nif (!stageId) {\n  throw new Error(\"Could not find 'qualified' stage in any HubSpot deals pipeline. Verify pipeline stage labels in HubSpot.\");\n}\n\nreturn [{ json: { pipeline_id: pipelineId, stage_id: stageId } }];"
+      },
+      "id": "bw3-node-07",
+      "name": "Extract Qualified Stage ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1808, 304]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prospect = $('Call Sub-workflow').first().json;\nconst companyBody = $('Get Company from Supabase').first().json.body;\nconst company = (companyBody && companyBody.length > 0) ? companyBody[0] : null;\nconst stageData = $('Extract Qualified Stage ID').first().json;\n\nconst nameParts = (prospect.full_name || '').trim().split(' ');\nconst firstname = nameParts[0] || '';\nconst lastname = nameParts.slice(1).join(' ') || '';\n\nconst companyName = company ? company.name : 'Unknown Company';\nconst companyWebsite = (company && company.website) ? company.website : '';\n\nreturn [{ json: {\n  prospect_id: prospect.id,\n  email: prospect.email,\n  full_name: prospect.full_name,\n  firstname,\n  lastname,\n  company_name: companyName,\n  company_website: companyWebsite,\n  pipeline_id: stageData.pipeline_id,\n  stage_id: stageData.stage_id,\n  deal_name: companyName + ' — NogalSolutions Engagement'\n} }];"
+      },
+      "id": "bw3-node-08",
+      "name": "Prepare HubSpot Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2064, 304]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ inputs: [{ idProperty: 'email', id: $('Prepare HubSpot Data').first().json.email, properties: { email: $('Prepare HubSpot Data').first().json.email, firstname: $('Prepare HubSpot Data').first().json.firstname, lastname: $('Prepare HubSpot Data').first().json.lastname } }] }) }}",
+        "options": {}
+      },
+      "id": "bw3-node-09",
+      "name": "HubSpot: Upsert Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2320, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/companies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ properties: { name: $('Prepare HubSpot Data').first().json.company_name, domain: $('Prepare HubSpot Data').first().json.company_website } }) }}",
+        "options": {}
+      },
+      "id": "bw3-node-10",
+      "name": "HubSpot: Create Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2592, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/deals",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ properties: { dealname: $('Prepare HubSpot Data').first().json.deal_name, dealstage: $('Prepare HubSpot Data').first().json.stage_id, pipeline: $('Prepare HubSpot Data').first().json.pipeline_id }, associations: [ { to: { id: $('HubSpot: Upsert Contact').first().json.results[0].id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: $('Extract Association Type IDs').first().json.deal_contact_type_id }] }, { to: { id: $('HubSpot: Create Company').first().json.id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: $('Extract Association Type IDs').first().json.deal_company_type_id }] } ] }) }}",
+        "options": {}
+      },
+      "id": "bw3-node-11",
+      "name": "HubSpot: Create Deal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3632, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ text: '🟢 New qualified prospect: *' + $('Prepare HubSpot Data').first().json.full_name + '* (' + $('Prepare HubSpot Data').first().json.email + ') from *' + $('Prepare HubSpot Data').first().json.company_name + '*. Booking email sent. HubSpot updated.' }) }}",
+        "options": {}
+      },
+      "id": "bw3-node-12",
+      "name": "Slack: Alert Aaron",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3888, 304]
+    },
+    {
+      "parameters": {
+        "url": "https://api.hubapi.com/crm/v4/associations/deals/contacts/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "bw3-node-13",
+      "name": "Fetch Deal-Contact Assoc Labels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2848, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.hubapi.com/crm/v4/associations/deals/companies/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "bw3-node-14",
+      "name": "Fetch Deal-Company Assoc Labels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3104, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const contactResults = $('Fetch Deal-Contact Assoc Labels').first().json.results;\nconst companyResults = $('Fetch Deal-Company Assoc Labels').first().json.results;\n\nconst contactType = contactResults.find(r => r.category === 'HUBSPOT_DEFINED' && r.label === null)\n  || contactResults.find(r => r.category === 'HUBSPOT_DEFINED');\n\nconst companyType = companyResults.find(r => r.category === 'HUBSPOT_DEFINED' && r.label === null)\n  || companyResults.find(r => r.category === 'HUBSPOT_DEFINED');\n\nif (!contactType) throw new Error('Could not find HUBSPOT_DEFINED deal->contact association type from HubSpot labels API');\nif (!companyType) throw new Error('Could not find HUBSPOT_DEFINED deal->company association type from HubSpot labels API');\n\nreturn [{ json: {\n  deal_contact_type_id: contactType.typeId,\n  deal_company_type_id: companyType.typeId\n} }];"
+      },
+      "id": "bw3-node-15",
+      "name": "Extract Association Type IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3360, 304]
+    }
+  ],
+  "connections": {
+    "Qualified Handoff Trigger": {
+      "main": [[{ "node": "Extract Submission ID", "type": "main", "index": 0 }]]
+    },
+    "Extract Submission ID": {
+      "main": [[{ "node": "Call Sub-workflow", "type": "main", "index": 0 }]]
+    },
+    "Call Sub-workflow": {
+      "main": [[{ "node": "Send Booking Email", "type": "main", "index": 0 }]]
+    },
+    "Send Booking Email": {
+      "main": [[{ "node": "Get Company from Supabase", "type": "main", "index": 0 }]]
+    },
+    "Get Company from Supabase": {
+      "main": [[{ "node": "Fetch HubSpot Pipeline Stages", "type": "main", "index": 0 }]]
+    },
+    "Fetch HubSpot Pipeline Stages": {
+      "main": [[{ "node": "Extract Qualified Stage ID", "type": "main", "index": 0 }]]
+    },
+    "Extract Qualified Stage ID": {
+      "main": [[{ "node": "Prepare HubSpot Data", "type": "main", "index": 0 }]]
+    },
+    "Prepare HubSpot Data": {
+      "main": [[{ "node": "HubSpot: Upsert Contact", "type": "main", "index": 0 }]]
+    },
+    "HubSpot: Upsert Contact": {
+      "main": [[{ "node": "HubSpot: Create Company", "type": "main", "index": 0 }]]
+    },
+    "HubSpot: Create Deal": {
+      "main": [[{ "node": "Slack: Alert Aaron", "type": "main", "index": 0 }]]
+    },
+    "HubSpot: Create Company": {
+      "main": [[{ "node": "Fetch Deal-Contact Assoc Labels", "type": "main", "index": 0 }]]
+    },
+    "Fetch Deal-Contact Assoc Labels": {
+      "main": [[{ "node": "Fetch Deal-Company Assoc Labels", "type": "main", "index": 0 }]]
+    },
+    "Fetch Deal-Company Assoc Labels": {
+      "main": [[{ "node": "Extract Association Type IDs", "type": "main", "index": 0 }]]
+    },
+    "Extract Association Type IDs": {
+      "main": [[{ "node": "HubSpot: Create Deal", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}

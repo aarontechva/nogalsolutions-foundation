@@ -1,0 +1,137 @@
+{
+  "id": "nSIfJuLYKnralK46",
+  "name": "NogalSolutions-BW4 Not-Qualified Decline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "not-qualified-decline",
+        "options": {}
+      },
+      "id": "bw4-node-01",
+      "name": "Not-Qualified Decline Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 304],
+      "webhookId": "b6f1595e-9807-43f5-b13d-d07559971d90"
+    },
+    {
+      "parameters": {
+        "jsCode": "const record = $json.body.record;\nif (!record || !record.intake_submission_id) {\n  throw new Error('Missing intake_submission_id in webhook payload: ' + JSON.stringify($json));\n}\nreturn [{ json: { intake_submission_id: record.intake_submission_id, qualified: false } }];"
+      },
+      "id": "bw4-node-02",
+      "name": "Extract Submission ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [512, 304]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UTrJJvfGmAyvTYrL",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "bw4-node-03",
+      "name": "Call Sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [768, 304]
+    },
+    {
+      "parameters": {
+        "from": "aaron@nogalsolutions.tech",
+        "to": "={{ $('Call Sub-workflow').first().json.email }}",
+        "subject": "A quick note on your NogalSolutions inquiry",
+        "html": "={{ '<p>Hi ' + $('Call Sub-workflow').first().json.full_name + ',</p><p>Thank you for filling out the form. After reviewing your submission, this isn\\'t the right moment for us to work together — but that can change.</p><p>The most common reason timing is off is that there are foundational things to get right first. I put together a short self-assessment for exactly this situation. It takes about 5 minutes and gives you a clear read on where you stand:</p><p style=\"margin:24px 0\"><a href=\"https://nogalsolutions.tech/resources/automation-readiness-check.pdf\" style=\"display:inline-block;padding:12px 24px;background:#000;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;\">Run the 5-Minute Automation Readiness Check →</a></p><p>If your situation changes, the form will be here. Resubmissions are welcome — I look at each one fresh.</p><p>Aaron<br>NogalSolutions</p>' }}",
+        "additionalOptions": {
+          "replyTo": "aaronnogal.va@gmail.com"
+        }
+      },
+      "id": "bw4-node-04",
+      "name": "Send Decline Email",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [1024, 304],
+      "webhookId": "805b4372-51a5-42ee-9b38-fec7a5dd9a6c",
+      "credentials": {
+        "resendApi": {
+          "id": "ENq3vMUDFXGwUrab",
+          "name": "Resend account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prospect = $('Call Sub-workflow').first().json;\nconst nameParts = (prospect.full_name || '').trim().split(' ');\nconst firstname = nameParts[0] || '';\nconst lastname = nameParts.slice(1).join(' ') || '';\nreturn [{ json: { email: prospect.email, firstname, lastname } }];"
+      },
+      "id": "bw4-node-05",
+      "name": "Prepare Contact Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1280, 304]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ inputs: [{ idProperty: 'email', id: $('Prepare Contact Data').first().json.email, properties: { email: $('Prepare Contact Data').first().json.email, firstname: $('Prepare Contact Data').first().json.firstname, lastname: $('Prepare Contact Data').first().json.lastname } }] }) }}",
+        "options": {}
+      },
+      "id": "bw4-node-06",
+      "name": "HubSpot: Upsert Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1552, 304],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DdVdSVtCVZbUgwOD",
+          "name": "HubSpot Private App Token"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Not-Qualified Decline Trigger": {
+      "main": [[{ "node": "Extract Submission ID", "type": "main", "index": 0 }]]
+    },
+    "Extract Submission ID": {
+      "main": [[{ "node": "Call Sub-workflow", "type": "main", "index": 0 }]]
+    },
+    "Call Sub-workflow": {
+      "main": [[{ "node": "Send Decline Email", "type": "main", "index": 0 }]]
+    },
+    "Send Decline Email": {
+      "main": [[{ "node": "Prepare Contact Data", "type": "main", "index": 0 }]]
+    },
+    "Prepare Contact Data": {
+      "main": [[{ "node": "HubSpot: Upsert Contact", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}

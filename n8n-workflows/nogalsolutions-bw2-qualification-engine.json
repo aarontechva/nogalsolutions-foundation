@@ -1,0 +1,508 @@
+{
+  "id": "xQRC2D94sGlNhsSz",
+  "name": "NogalSolutions-BW2 Qualification Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "qualification-engine",
+        "options": {}
+      },
+      "id": "node-01",
+      "name": "Intake Submission Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [208, 304],
+      "webhookId": "bb359f2f-7ccd-44c3-8346-2be084f218a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\nconst record = body.record;\nconst payload = record.payload;\nconst submissionId = record.id;\nconst email = (payload.email || '').trim().toLowerCase();\nconst companyName = (payload.company || '').trim();\n\n// RULE 1: Required fields — field names confirmed from IntakeForm.tsx\nconst requiredFields = [\n  { field: 'name', value: payload.name },\n  { field: 'email', value: payload.email },\n  { field: 'company', value: payload.company },\n  { field: 'industry', value: payload.industry },\n  { field: 'problem_in_operations', value: payload.problem_in_operations },\n  { field: 'tech_stack', value: payload.tech_stack },\n  { field: 'timeline', value: payload.timeline },\n  { field: 'budget_range', value: payload.budget_range },\n  { field: 'goals_and_outcomes', value: payload.goals_and_outcomes },\n  { field: 'consent', value: payload.consent },\n];\nconst missing = requiredFields.filter(f => {\n  if (typeof f.value === 'boolean') return f.value !== true;\n  return f.value === null || f.value === undefined || String(f.value).trim() === '';\n});\nconst rule1 = {\n  rule: 1, name: 'Required fields present',\n  pass: missing.length === 0,\n  reason: missing.length === 0\n    ? 'All required fields present'\n    : 'Missing or empty: ' + missing.map(f => f.field).join(', ')\n};\n\n// RULE 2: Email valid + not disposable\nconst DISPOSABLE_DOMAINS = [\n  'mailinator.com','tempmail.com','guerrillamail.com','10minutemail.com',\n  'throwaway.email','yopmail.com','temp-mail.org','getnada.com',\n  'dispostable.com','maildrop.cc'\n];\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst isValidFormat = emailRegex.test(email);\nconst emailDomain = email.split('@')[1] || '';\nconst isDisposable = DISPOSABLE_DOMAINS.includes(emailDomain);\nconst rule2 = {\n  rule: 2, name: 'Email valid, not disposable',\n  pass: isValidFormat && !isDisposable,\n  reason: !isValidFormat ? 'Invalid email format'\n    : isDisposable ? 'Disposable domain: ' + emailDomain\n    : 'Email valid'\n};\n\n// RULE 4: Problem maps to a service (case-insensitive substring match)\n// Keyword seed list from Spec §4.1a — do not modify without version bump\nconst RULE4_KEYWORDS = [\n  'automate','automation','manual','repetitive','by hand','copy-paste','data entry','slow','time-consuming','tedious','rpa','robotic process','eliminate manual work',\n  'integrate','integration','connect','sync','api',\"doesn't talk to\",'disconnected systems','silo','silos','multiple systems','migrate data','single source of truth','consolidate',\n  'ai','artificial intelligence','machine learning','chatbot','agent','llm','predictive','generative','smart assistant','ai-powered','recommendation engine',\n  'analytics','reporting','business intelligence','insights','kpi','metrics','data analysis','forecasting','trend','data-driven','benchmarking',\n  'dashboard','real-time view','visualize','visualization','single pane of glass','live data','monitor performance','at-a-glance',\n  'optimize','optimization','streamline','bottleneck','slow','inefficient','efficiency','process improvement','restructure process','simplify process'\n];\nconst problemText = (payload.problem_in_operations || '').toLowerCase();\nconst matchedKeyword = RULE4_KEYWORDS.find(kw => problemText.includes(kw.toLowerCase()));\nconst rule4 = {\n  rule: 4, name: 'Problem maps to a service',\n  pass: !!matchedKeyword,\n  reason: matchedKeyword ? 'Matched keyword: ' + matchedKeyword : 'No service keyword matched in problem_in_operations'\n};\n\n// RULE 5: Budget not 'exploring'\n// Literal form value from IntakeForm.tsx BUDGET_OPTIONS\nconst budget = (payload.budget_range || '').trim();\nconst rule5 = {\n  rule: 5, name: 'Budget not exploring',\n  pass: budget !== 'exploring',\n  reason: budget === 'exploring' ? 'Budget is exploring (no budget set)' : 'Budget: ' + budget\n};\n\n// RULE 6: Timeline not 'no urgency'\n// Literal §4.2 enum value, matching frontend TIMELINE_OPTIONS\nconst timeline = (payload.timeline || '').trim();\nconst rule6 = {\n  rule: 6, name: 'Timeline not no urgency',\n  pass: timeline !== 'no urgency',\n  reason: timeline === 'no urgency' ? 'Timeline is no urgency' : 'Timeline: ' + timeline\n};\n\n// RULE 7: Tech stack disclosed\nconst techStack = (payload.tech_stack || '').trim();\nconst rule7 = {\n  rule: 7, name: 'Tech stack disclosed',\n  pass: techStack !== '' && techStack.toLowerCase() !== 'skip',\n  reason: techStack === '' ? 'Tech stack is empty'\n    : techStack.toLowerCase() === 'skip' ? 'Tech stack is skip'\n    : 'Tech stack provided'\n};\n\nreturn [{ json: { submissionId, record, payload, email, companyName, partialRules: [rule1, rule2, rule4, rule5, rule6, rule7] } }];"
+      },
+      "id": "node-02",
+      "name": "Phase 1: Evaluate Rules",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [464, 304]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/prospects?email=eq.' + encodeURIComponent($json.email) + '&select=id&limit=1' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "node-03",
+      "name": "Rule 3: Check Duplicate Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/companies?name=ilike.' + encodeURIComponent($('Phase 1: Evaluate Rules').first().json.companyName) + '&select=id&limit=1' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "node-04",
+      "name": "Lookup Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [992, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const phase1 = $('Phase 1: Evaluate Rules').first().json;\nconst rule3Resp = $('Rule 3: Check Duplicate Email').first().json;\nconst companyResp = $('Lookup Company').first().json;\n\n// fullResponse format: { statusCode, headers, body }\nconst rule3Body = Array.isArray(rule3Resp.body) ? rule3Resp.body : [];\nconst companyBody = Array.isArray(companyResp.body) ? companyResp.body : [];\n\nconst existingProspectId = rule3Body.length > 0 ? rule3Body[0].id : null;\nconst existingCompanyId = companyBody.length > 0 ? companyBody[0].id : null;\n\nconst rule3 = {\n  rule: 3, name: 'No duplicate prospect',\n  pass: existingProspectId === null,\n  reason: existingProspectId !== null\n    ? 'Existing prospect found: ' + existingProspectId\n    : 'No existing prospect with this email'\n};\n\n// All 7 rules in spec order — look up by rule tag, not position\nconst findRule = (n) => phase1.partialRules.find(r => r.rule === n);\nconst allRules = [1,2,3,4,5,6,7].map(n => n === 3 ? rule3 : findRule(n));\n\nconst threshold = parseInt($env.QUALIFICATION_THRESHOLD) || 6;\nconst passCount = allRules.filter(r => r.pass).length;\nconst qualified = passCount >= threshold;\nconst failedRules = allRules.filter(r => !r.pass).map(r => r.name);\nconst reason = qualified\n  ? 'Qualified: ' + passCount + '/7 rules passed'\n  : 'Not qualified: ' + passCount + '/7 rules passed. Failed: ' + failedRules.join(', ');\n\nreturn [{ json: {\n  ...phase1,\n  existingProspectId,\n  existingCompanyId,\n  isNewCompany: existingCompanyId === null,\n  isExistingProspect: existingProspectId !== null,\n  allRules,\n  qualified,\n  reason,\n  passCount,\n  threshold\n} }];"
+      },
+      "id": "node-05",
+      "name": "Finalize Qualification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1248, 304]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-company",
+              "leftValue": "={{ $json.isNewCompany }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-06",
+      "name": "Company Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1504, 304]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn [{ json: { ...data, company_id: data.existingCompanyId } }];"
+      },
+      "id": "node-07",
+      "name": "Use Existing Company",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/companies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({name: $json.companyName}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "node-08",
+      "name": "Create Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 448],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "node-09",
+      "name": "Merge: Company",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2032, 304]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n// Use Existing Company path: company_id already set\n// Create Company path (HTTP fullResponse): body is [{id, name, ...}]\nlet company_id;\nif (item.company_id) {\n  company_id = item.company_id;\n} else if (item.body && Array.isArray(item.body) && item.body.length > 0) {\n  company_id = item.body[0].id;\n}\n// Rebuild full context (Create Company path loses phase1 data)\nconst base = $('Finalize Qualification').first().json;\nreturn [{ json: { ...base, company_id } }];"
+      },
+      "id": "node-10",
+      "name": "Set Company ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2288, 304]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-prospect",
+              "leftValue": "={{ $json.isExistingProspect }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-11",
+      "name": "Prospect Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2544, 304]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nreturn [{ json: { ...data, prospect_id: data.existingProspectId } }];"
+      },
+      "id": "node-12",
+      "name": "Use Existing Prospect",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2800, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/prospects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({full_name: $json.payload.name, email: $json.email, company_id: $json.company_id, status: 'new'}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "node-13",
+      "name": "Insert Prospect",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2800, 448],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-toctou",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 201,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-14",
+      "name": "TOCTOU: Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [3072, 448]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-j7un.srv1769180.hstgr.cloud/webhook/not-qualified-decline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({event: 'toctou_concurrent_duplicate', submission_id: $('Finalize Qualification').first().json.submissionId, email: $('Finalize Qualification').first().json.email}) }}",
+        "options": {}
+      },
+      "id": "node-15",
+      "name": "Notify WF4: Concurrent Duplicate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3328, 592]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n// INSERT succeeded: fullResponse body is [{id, full_name, email, ...}]\nconst prospect_id = item.body && Array.isArray(item.body) && item.body.length > 0\n  ? item.body[0].id\n  : null;\nconst base = $('Set Company ID').first().json;\nreturn [{ json: { ...base, prospect_id } }];"
+      },
+      "id": "node-16",
+      "name": "Set New Prospect ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3328, 448]
+    },
+    {
+      "parameters": {},
+      "id": "node-17",
+      "name": "Merge: Prospect",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [3584, 304]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/intake_submissions?id=eq.' + $json.submissionId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({prospect_id: $json.prospect_id}) }}",
+        "options": {}
+      },
+      "id": "node-18",
+      "name": "Update Intake Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3840, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tciohfpbhummxxwxiscd.supabase.co/rest/v1/qualification_results",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({intake_submission_id: $('Merge: Prospect').first().json.submissionId, qualified: $('Merge: Prospect').first().json.qualified, reason: $('Merge: Prospect').first().json.reason, rule_results: $('Merge: Prospect').first().json.allRules, evaluated_at: new Date().toISOString()}) }}",
+        "options": {}
+      },
+      "id": "node-19",
+      "name": "Upsert Qualification Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4112, 304],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "EWkrK7GWLBdKg04s",
+          "name": "Supabase Service Role (Custom Auth)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "node-20",
+      "name": "Phase 3 Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [4368, 304]
+    }
+  ],
+  "connections": {
+    "Intake Submission Trigger": {
+      "main": [[{ "node": "Phase 1: Evaluate Rules", "type": "main", "index": 0 }]]
+    },
+    "Phase 1: Evaluate Rules": {
+      "main": [[{ "node": "Rule 3: Check Duplicate Email", "type": "main", "index": 0 }]]
+    },
+    "Rule 3: Check Duplicate Email": {
+      "main": [[{ "node": "Lookup Company", "type": "main", "index": 0 }]]
+    },
+    "Lookup Company": {
+      "main": [[{ "node": "Finalize Qualification", "type": "main", "index": 0 }]]
+    },
+    "Finalize Qualification": {
+      "main": [[{ "node": "Company Exists?", "type": "main", "index": 0 }]]
+    },
+    "Company Exists?": {
+      "main": [
+        [{ "node": "Use Existing Company", "type": "main", "index": 0 }],
+        [{ "node": "Create Company", "type": "main", "index": 0 }]
+      ]
+    },
+    "Use Existing Company": {
+      "main": [[{ "node": "Merge: Company", "type": "main", "index": 0 }]]
+    },
+    "Create Company": {
+      "main": [[{ "node": "Merge: Company", "type": "main", "index": 1 }]]
+    },
+    "Merge: Company": {
+      "main": [[{ "node": "Set Company ID", "type": "main", "index": 0 }]]
+    },
+    "Set Company ID": {
+      "main": [[{ "node": "Prospect Exists?", "type": "main", "index": 0 }]]
+    },
+    "Prospect Exists?": {
+      "main": [
+        [{ "node": "Use Existing Prospect", "type": "main", "index": 0 }],
+        [{ "node": "Insert Prospect", "type": "main", "index": 0 }]
+      ]
+    },
+    "Use Existing Prospect": {
+      "main": [[{ "node": "Merge: Prospect", "type": "main", "index": 0 }]]
+    },
+    "Insert Prospect": {
+      "main": [[{ "node": "TOCTOU: Is Duplicate?", "type": "main", "index": 0 }]]
+    },
+    "TOCTOU: Is Duplicate?": {
+      "main": [
+        [{ "node": "Notify WF4: Concurrent Duplicate", "type": "main", "index": 0 }],
+        [{ "node": "Set New Prospect ID", "type": "main", "index": 0 }]
+      ]
+    },
+    "Set New Prospect ID": {
+      "main": [[{ "node": "Merge: Prospect", "type": "main", "index": 1 }]]
+    },
+    "Merge: Prospect": {
+      "main": [[{ "node": "Update Intake Submission", "type": "main", "index": 0 }]]
+    },
+    "Update Intake Submission": {
+      "main": [[{ "node": "Upsert Qualification Result", "type": "main", "index": 0 }]]
+    },
+    "Upsert Qualification Result": {
+      "main": [[{ "node": "Phase 3 Complete", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "tags": []
+}
