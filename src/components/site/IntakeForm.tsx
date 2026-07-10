@@ -45,11 +45,11 @@ const INDUSTRY_OPTIONS = [
 // the value string "someday". Additional granularity added for leads that are ready
 // sooner, giving the classifier enough resolution to tier urgency.
 const TIMELINE_OPTIONS = [
-  { value: "asap", label: "ASAP (within 2 weeks)" },
-  { value: "1-3-months", label: "1–3 months" },
-  { value: "3-6-months", label: "3–6 months" },
-  { value: "6-12-months", label: "6–12 months" },
-  { value: "someday", label: "Someday / Exploring" },
+  { value: "<1mo", label: "ASAP (within 2 weeks)" },
+  { value: "1-3mo", label: "1–3 months" },
+  { value: "3-6mo", label: "3–6 months" },
+  { value: "6mo+", label: "6–12 months" },
+  { value: "no urgency", label: "Someday / Exploring" },
 ] as const;
 
 // ─── FIELD 8: BUDGET OPTIONS ──────────────────────────────────────────────────
