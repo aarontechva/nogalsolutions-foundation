@@ -1,0 +1,25 @@
+{
+  "enabledPlugins": {},
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat docs/current-state.md docs/next-task.md 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before ending this turn, check: (1) uncommitted git changes not yet explained to Aaron, (2) real progress this turn not yet reflected in docs/current-state.md or docs/next-task.md, (3) a natural stopping point where /save-state or /baton-pass should be offered. If any apply, do not just stop - tell Aaron what's unresolved and offer to run /save-state. Otherwise, let the turn end normally."
+          }
+        ]
+      }
+    ]
+  }
+}
