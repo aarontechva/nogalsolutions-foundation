@@ -1,0 +1,22 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          { "type": "command", "command": "cat docs/current-state.md docs/next-task.md 2>/dev/null || true" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git status --porcelain | grep -q . && echo {\"decision\":\"block\",\"reason\":\"Uncommitted changes exist - consider /save-state before stopping.\"} || echo {}"
+          }
+        ]
+      }
+    ]
+  }
+}
