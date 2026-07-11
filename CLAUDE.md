@@ -34,6 +34,39 @@ Per the Spec's own rule: any deviation from what's documented in `docs/spec.md` 
 - **If you ever see `TRUNCATE`, `REFERENCES`, or `TRIGGER` granted to `anon` or `authenticated` on any table again — stop and investigate the cause before just re-revoking.** `pg_default_acl` was checked and confirmed empty for `anon`/`authenticated` on `public` as of this date, meaning there's no standing rule that should be re-granting these. A reappearance means something new happened (e.g., a table drop/recreate, a migration script with a broad `GRANT ALL`), not a recurrence of the same untouched bug.
 - **Workflow 2 (Qualification Engine): not yet implemented.** Spec §4.1a is fully specified and was blocked only on Workflow 1's trigger existing for real — that condition is now met.
 
+## Production database writes — hard gate, no exceptions
+
+This Supabase MCP connection is scoped to `nogalsolutions-prod` directly
+(not a branch), with write access enabled (`--features=database,docs`,
+no `--read-only`). That means `execute_sql` and `apply_migration` are
+live production actions the moment they're called — there is no
+branch or staging layer between you and the real database.
+
+Before calling `apply_migration` (schema/DDL changes) or `execute_sql`
+where the query is anything other than a `SELECT` (any `INSERT`,
+`UPDATE`, `DELETE`, `GRANT`, `REVOKE`, `CREATE`, `ALTER`, `DROP`, or
+similar):
+
+1. **Stop. Do not call the tool yet.**
+2. Present the exact SQL you intend to run, verbatim, to Aaron.
+3. State plainly what it will change and why (which tables/rows/grants
+   are affected, and what happens if it's wrong).
+4. Wait for explicit go-ahead in the conversation — not an inferred
+   "this seems fine," not proceeding because the task implies it's
+   needed. An explicit yes, every time.
+5. Only then call the tool.
+
+This applies **every time**, not just the first time in a session. A
+prior approval for one migration does not authorize the next one. This
+is the same gate shape as "no n8n workflow activation without Aaron's
+node-by-node review" (Spec §10.2 Option A) — just applied one layer
+earlier, at the database, since there is no activation step to gate
+here the way there is for workflows.
+
+Read-only queries (`SELECT`, `list_tables`, schema inspection, log
+retrieval) do not require this gate — verify freely, that's the whole
+point of having direct Supabase access at all.
+
 ## Current locked version
 
 Spec v2.8 / Roadmap v2.4, locked 2026-07-08. Most recent changes: **Workflow 4's HubSpot behavior resolved in §7a** (Contact-only upsert, no Deal — settles a real disagreement between §1.3 and §7's row 4 that §7a had previously sided with silently, without flagging it); **Rule 3 cap warning added to §4.1a** (any returning submission — nurture lead or past client — always fails Rule 3 by definition; safe only while `QUALIFICATION_THRESHOLD` stays at 6, not 7). Also present: **§3.4a** (Privilege Verification Checklist), **§4.1a** (Workflow 2 architecture), **§7a** (Workflows 3 & 4 shared sub-workflow architecture). If you're building Workflow 4, read §7a's Workflow 4 section first — it now specifies the Contact-only HubSpot push. If you're touching `QUALIFICATION_THRESHOLD`, read the Rule 3 callout in §4.1a first.
