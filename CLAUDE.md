@@ -76,6 +76,52 @@ Read-only queries (`SELECT`, `list_tables`, schema inspection, log
 retrieval) do not require this gate — verify freely, that's the whole
 point of having direct Supabase access at all.
 
+## HubSpot configuration changes — hard gate, no exceptions
+
+Once a HubSpot MCP connection exists, any tool call that creates,
+modifies, or deletes a custom object definition, a custom property, a
+pipeline/stage definition, an association, or a workflow/automation
+inside HubSpot is a live production change the moment it's called —
+HubSpot has no branch or draft state for this the way n8n workflows can
+be built inactive and reviewed node-by-node first.
+
+Before calling any such tool (creating a custom object type,
+adding/editing a property, defining a pipeline stage, creating a
+HubSpot workflow/automation, or similar):
+
+1. **Stop. Do not call the tool yet.**
+2. Present the exact change you intend to make, verbatim — object or
+   property name, type, and any options — to Aaron.
+3. State plainly what it will affect and why (which existing workflows
+   or Gate #1/#2 field mappings depend on this exact name matching, and
+   what breaks if it's wrong).
+4. Wait for explicit go-ahead in the conversation — not an inferred
+   "this seems fine," not proceeding because the task implies it's
+   needed. An explicit yes, every time.
+5. Only then call the tool.
+
+This applies **every time**, not just the first time in a session. A
+prior approval for one property does not authorize the next one. Same
+gate shape as the Supabase production-write gate above and "no n8n
+workflow activation without Aaron's node-by-node review" (Spec §10.2
+Option A) — applied at the third system in the stack with no staging
+layer of its own.
+
+Read-only operations (listing existing properties/objects, fetching
+records, searching) do not require this gate — verify freely.
+
+This gate covers structural/config changes to HubSpot itself — its
+schema, in effect. It does **not** re-gate the routine Contact / Deal /
+custom-object *record* writes n8n workflows already make as part of
+their normal, reviewed behavior (Spec §8.1) — those went through
+workflow-activation review already (§10.2) and don't need per-record
+approval on top of it. The line is: schema-level changes made directly
+by an AI session with live MCP access need per-call sign-off; record
+writes made by an already-reviewed, already-active workflow at runtime
+do not.
+
 ## Current locked version
 
-Spec v2.8 / Roadmap v2.4, locked 2026-07-08. Present in the spec: **§3.4a** (Privilege Verification Checklist), **§4.1a** (Workflow 2 architecture, including the Rule 3 cap warning — any returning submission always fails Rule 3 by definition; safe only while `QUALIFICATION_THRESHOLD` stays at 6, not 7), **§7a** (Workflows 3 & 4 shared sub-workflow architecture, including Workflow 4's Contact-only HubSpot resolution — no Deal). If you're touching `QUALIFICATION_THRESHOLD`, read the Rule 3 callout in §4.1a first. If you're touching Workflow 4's HubSpot behavior, read §7a first. **Verify this version number against `docs/spec.md`'s own header before trusting it** — same discipline as everything else in this file.
+Spec v2.9 / Roadmap v2.4, Spec last bumped 2026-07-12. Present in the spec: **§3.4a** (Privilege Verification Checklist), **§4.1a** (Workflow 2 architecture, including the Rule 3 cap warning — any returning submission always fails Rule 3 by definition; safe only while `QUALIFICATION_THRESHOLD` stays at 6, not 7), **§7a** (Workflows 3 & 4 shared sub-workflow architecture, including Workflow 4's Contact-only HubSpot resolution — no Deal), **§7b** (Workflows 5–8 architecture decisions: Workflow 5's Database Webhook trigger + `transcription_status = 'failed'` handling, Workflow 7's delete-and-restart idempotency, Workflow 8's HubSpot multi-select scope selection, and the Gate #1/#2 HubSpot field mappings — including the resolved pre-send correction versioning rule, Option B). If you're touching `QUALIFICATION_THRESHOLD`, read the Rule 3 callout in §4.1a first. If you're touching Workflow 4's HubSpot behavior, read §7a first. If you're building Workflows 5–8, read §7b first — in particular, the `ALTER TYPE transcription_status ADD VALUE 'failed'` migration it requires still needs to go through the production DB write hard gate above; it has not been applied yet. **Verify this version number against `docs/spec.md`'s own header before trusting it** — same discipline as everything else in this file.
+
+A companion **Prompt Library v1** (`docs/prompt-library.md`, canonical `NogalSolutions_Prompt_Library_V1.docx` maintained outside the repo like the Spec) is now accepted and canonical as of 2026-07-12. It owns the actual system-prompt text and JSON schemas for Prompt A and B1–B7 (Spec §6 delegates this on purpose — prompt wording iterates independently of the Spec's version number). Workflows 6, 7, and 8 must be built against it, not improvised.
