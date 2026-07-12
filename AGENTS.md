@@ -138,3 +138,45 @@ Stop and flag it rather than deciding on your own:
   in a way not already scoped by the task
 - Any credential, endpoint, or account-level action neither you nor
   the handoff notes have direct visibility into
+
+## Handoff procedure (baton-pass equivalent — no slash commands in Codex)
+
+Codex does not support the same slash-command mechanism Claude Code
+uses for `/save-state`, `/foresight`, `/baton-pass`, etc. — perform
+these as plain actions when the situation calls for it, using the
+exact procedures below. The file formats must match what Claude
+produces, since both agents read/write the same files.
+
+### When starting or resuming work ("foresight")
+1. Read `baton-pass.config.json` for file paths.
+2. Check: current goal (from `docs/next-task.md`'s Turn State), `git
+   status`, `git log --oneline -5`, `docs/current-state.md`,
+   `docs/next-task.md`, the latest entry in `docs/progress.md`.
+3. State plainly whether what's written matches what you find. If it
+   doesn't, correct `docs/current-state.md`/`next-task.md` first —
+   using direct verification (n8n-mcp, Supabase MCP), not assumption —
+   before doing anything else.
+
+### When pausing without full handoff ("save-state")
+Use when work is incomplete but ownership isn't transferring (e.g.
+before a break, not before switching to Claude).
+1. Append an entry to `docs/progress.md`: current task, stopped at,
+   files touched, next immediate action, blocker/risk if any. Delta
+   only — don't restate project history.
+2. Update `docs/next-task.md`'s Turn State block: State: paused, Last
+   Move: save-state, Last Agent: codex, Next Agent: codex, Updated At:
+   today's date.
+3. Mirror the same Turn State into `baton-pass.state.json`.
+
+### When handing off to Claude ("baton-pass")
+Use when tokens are low or ownership is genuinely transferring.
+1. Commit any staged work first. If you can't, say so explicitly in
+   the baton — never hand off a dirty tree silently.
+2. Append a baton entry to `docs/progress.md`: goal, done (this
+   session), files touched, verified (exact vocabulary only: `passed`
+   / `passed outside sandbox` / `not run — [reason]` / `expected to
+   pass, unverified` — never round up), next immediate action, risks,
+   next agent.
+3. Update `docs/next-task.md`'s Turn State: State: handed-off, Last
+   Move: baton-pass, Last Agent: codex, Next Agent: claude, Updated
+   At: today's date. Mirror into `baton-pass.state.json`.
