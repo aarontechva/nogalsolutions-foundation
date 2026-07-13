@@ -49,4 +49,5 @@ Do not add one by reflex.
 
 Add your project-specific rules below:
 
-- 
+- Every `current-state.md` edit must rewrite the top summary block (`Current Phase`/`In Progress`/`Next`/`Blockers`/`Last Verified Against`) to match the latest `Complete` entry — don't just append to `Complete` and leave the top stale. (Hindsight 018, `docs/progress.md`)
+- Every `progress.md` entry uses the next unused sequential number, even when documenting content that logically happened earlier than the latest entry — say so in the entry body instead of reusing or reordering a number. (Hindsight 018, `docs/progress.md`)
