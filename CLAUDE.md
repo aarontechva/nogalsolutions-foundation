@@ -8,7 +8,7 @@ AI-augmented consulting ops pipeline. Frontend on Cloudflare Pages, backend on S
 
 ## Source of truth — read this carefully
 
-- **The canonical documents are `NogalSolutions_Spec_V2_8.docx` and `NogalSolutions_Roadmap_V2_4.docx`**, maintained and version-locked outside this repo (Aaron reviews and accepts changes to them directly in Word, tracked-changes on).
+- **The canonical documents are `NogalSolutions_Spec_V2_10.docx` and `NogalSolutions_Roadmap_V2_4.docx`**, maintained and version-locked outside this repo (Aaron reviews and accepts changes to them directly in Word, tracked-changes on).
 - `docs/spec.md` and `docs/roadmap.md` in this repo are **generated mirrors** of those docx files, kept here only so Claude Code CLI (and anything else that reads plain text) can actually see them. They are not independently authoritative.
 - **Do not hand-edit `docs/spec.md` or `docs/roadmap.md`.** If something in them looks wrong, outdated, or contradicts what you find in the live system, say so explicitly and stop — don't silently patch the mirror. Any real spec change happens in the docx, reviewed by Aaron, then re-exported to these mirrors.
 - If `docs/spec.md` and `docs/roadmap.md` ever go stale relative to the current docx version, that's a bug to flag, not something to guess past.
