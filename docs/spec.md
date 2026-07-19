@@ -13,7 +13,7 @@ builds against.*
 | **Platform**         | Cloudflare Pages (frontend) + Supabase + n8n  |
 |                      | on Hostinger VPS + HubSpot (review surface)   |
 +----------------------+-----------------------------------------------+
-| **Status**           | v2.11 --- Locked. Deviations require version  |
+| **Status**           | v2.12 --- Locked. Deviations require version  |
 |                      | bump.                                         |
 +----------------------+-----------------------------------------------+
 | **Version**          | 2.10 --- §7c added: AI provider migration to  |
@@ -48,8 +48,27 @@ builds against.*
 |                      | deal. §1.2: "Send to client" flips from No to |
 |                      | Yes. §7: "8 workflows total" becomes "10      |
 |                      | workflows total."                             |
+|                      |                                               |
+|                      | 2.12 --- §7d Decision 3 corrected: Workflow   |
+|                      | 10 on success also PATCHes the associated     |
+|                      | Deal\'s dealstage to contractsent (displayed  |
+|                      | as "sent" in this portal\'s pipeline), a      |
+|                      | stage-transition push already covered by      |
+|                      | §8\'s existing Supabase---HubSpot data-flow   |
+|                      | table. Closes a gap between the "closes the   |
+|                      | deal" language describing Workflow 10 in      |
+|                      | §1.2\'s capability table and elsewhere, and   |
+|                      | what Decision 3 actually specified --- found  |
+|                      | via a live-system audit after Workflow 10 had |
+|                      | already shipped and processed one real        |
+|                      | completed engagement without ever writing to  |
+|                      | the Deal object. Deal-won/lost progression    |
+|                      | remains Aaron\'s manual call; Workflow 10     |
+|                      | does not write closedwon or closedlost.       |
+|                      | §1.2\'s capability-table description updated  |
+|                      | to match.                                     |
 +----------------------+-----------------------------------------------+
-| **Date**             | 2026-07-16                                    |
+| **Date**             | 2026-07-19                                    |
 +----------------------+-----------------------------------------------+
 
 *If it is not in this document, it does not get built.*
@@ -130,8 +149,9 @@ where it does not. It supersedes all prior placement maps.
                                      Gate #2-approved; Aaron flips Client
                                      Requirements\' Ready to Send property
                                      once negotiation concludes, and n8n
-                                     (Workflow 10) emails that PDF and closes
-                                     the deal automatically
+                                     (Workflow 10) emails that PDF and
+                                     advances the associated Deal to the sent
+                                     stage
 
   Second-call proposal  No           Aaron leads the call
   walkthrough                        
@@ -1819,7 +1839,13 @@ document Aaron already presented, per his explicit call to avoid a
 second rendering path --- and emails it to the prospect via the existing
 SMTP/Resend credential (§11). On success, writes sent_at = now() and
 status = \'sent\' to all 7 deliverables rows for that prospect ---
-HubSpot remains a view, not a store, per §8. If no rendered PDF exists
+HubSpot remains a view, not a store, per §8. On success, also updates
+the associated Deal\'s dealstage to contractsent (displayed as "sent" in
+this portal\'s pipeline) via a direct HubSpot PATCH --- a
+stage-transition push per §8\'s existing data-flow table, not a new
+authoritative store. Workflow 10 deliberately does not write closedwon
+or closedlost; actual deal-won/lost progression remains Aaron\'s manual
+call in HubSpot once negotiation concludes. If no rendered PDF exists
 yet for this prospect, hard-fails clean and alerts Aaron via Slack
 rather than sending nothing or a stale document.
 
