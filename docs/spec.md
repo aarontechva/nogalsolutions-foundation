@@ -13,7 +13,7 @@ builds against.*
 | **Platform**         | Cloudflare Pages (frontend) + Supabase + n8n  |
 |                      | on Hostinger VPS + HubSpot (review surface)   |
 +----------------------+-----------------------------------------------+
-| **Status**           | v2.12 --- Locked. Deviations require version  |
+| **Status**           | v2.13 --- Locked. Deviations require version  |
 |                      | bump.                                         |
 +----------------------+-----------------------------------------------+
 | **Version**          | 2.10 --- §7c added: AI provider migration to  |
@@ -67,6 +67,24 @@ builds against.*
 |                      | does not write closedwon or closedlost.       |
 |                      | §1.2\'s capability-table description updated  |
 |                      | to match.                                     |
+|                      |                                               |
+|                      | 2.13 --- §7e added: Deal-Stage Progression    |
+|                      | Automation (Architecture Decision Record).    |
+|                      | Workflow 5 succeeding, Workflow 6 creating    |
+|                      | the Gate #1 Task, and Workflow 7 creating the |
+|                      | Gate #2 Task now each advance the Deal to the |
+|                      | pipeline stage labeled "discovery completed," |
+|                      | "analysis pending," and "deliverables         |
+|                      | pending" respectively, via a new shared       |
+|                      | "Advance Deal Stage" sub-workflow             |
+|                      | (label-match pattern, not hardcoded stage IDs |
+|                      | --- matching Workflow 3\'s own existing       |
+|                      | convention). Closes the remainder of the gap  |
+|                      | v2.12 partially addressed: the Deal           |
+|                      | previously only ever moved twice (qualified   |
+|                      | at booking, sent at close), skipping every    |
+|                      | stage in between. No new Postgres schema or   |
+|                      | HubSpot properties.                           |
 +----------------------+-----------------------------------------------+
 | **Date**             | 2026-07-19                                    |
 +----------------------+-----------------------------------------------+
@@ -1866,6 +1884,100 @@ deliverables.status/sent_at already support this; one new HubSpot
 property (Ready to Send) on Client Requirements, no new Supabase
 columns.
 
+# 7e. Deal-Stage Progression Automation (Architecture Decision Record)
+
+Architecture decision record, drafted by Claude Code CLI with Aaron in
+this session (2026-07-19), immediately following the same session that
+corrected §7d Decision 3 (v2.12). Closes a gap Aaron identified directly
+on HubSpot\'s own board view: the Deal created at Workflow 3\'s booking
+step never advances again until Workflow 10 sends the final proposal ---
+every intermediate stage this portal\'s pipeline defines sits
+permanently unused, defeating the point of an automation-driven CRM.
+
+Context. Workflow 3 already deliberately looks up and writes a Deal
+stage by label when creating the Deal (its Extract Qualified Stage ID
+node dynamically matches stage.label.toLowerCase() === "qualified"
+rather than hardcoding an internal stage ID --- this portal\'s stage IDs
+and display labels are independently customizable, per v2.12\'s own
+closedwon/closedlost label-mismatch finding). A live-system audit
+(Hindsight 101) plus Aaron\'s own direct observation of the board view
+(2026-07-19) found nothing between Deal creation and Workflow 10\'s send
+ever advances that stage --- confirmed against a real execution (414):
+the Deal jumped from "qualified" straight to "sent" in one PATCH,
+skipping three intermediate stages this pipeline\'s board already
+defines.
+
+**Decision 1 --- Stage-Advance Mapping.** Three additional Deal-stage
+writes, one per existing pipeline milestone, using the exact dynamic
+label-match pattern Workflow 3 already established (never hardcode an
+internal stage ID): Workflow 5 (Recording Watcher/Transcription)
+succeeding advances the Deal to the stage labeled "discovery completed"
+(this portal\'s qualifiedtobuy); Workflow 6 (Post-Call Analysis)
+creating the Gate #1 review Task advances it to the stage labeled
+"analysis pending" (presentationscheduled); Workflow 7 (Sequenced
+Generation) creating the Gate #2 review Task advances it to the stage
+labeled "deliverables pending" (decisionmakerboughtin). Workflow 10\'s
+contractsent write (v2.12) is unchanged. Aaron confirmed this exact
+mapping (2026-07-19) --- no adjustment requested.
+
+**Decision 2 --- Shared "Advance Deal Stage" Sub-workflow.** Rather than
+duplicating the pipeline-stage-lookup-and-PATCH logic three times inline
+(as Workflow 10\'s v2.12 fix did once), a new shared sub-workflow ---
+parameterized by {contactId, targetStageLabel} --- is called via Execute
+Workflow from each of Workflows 5, 6, and 7, matching this project\'s
+existing precedent for reusable cross-workflow logic (the Resolve
+Prospect + Update Status sub-workflow; the shared Render Deliverables
+PDF sub-workflow). Internally it: fetches the deals pipeline\'s stage
+list, matches by label (Workflow 3\'s exact pattern --- hard-fails with
+a clear error if no stage matches the given label, not a silent no-op),
+finds the Contact\'s associated Deal via the v4 associations endpoint
+(the same pattern proven working in Workflow 10\'s Find Associated Deal
+node), and PATCHes dealstage. Each calling workflow resolves its own
+Contact ID first: Workflows 6 and 7 already resolve one for their
+existing Client Requirements/Deliverable-to-Contact associations and can
+reuse it directly; Workflow 5 has no existing HubSpot interaction today
+and needs a new Contact-by-email lookup first, using the prospect\'s
+email already available via discovery_sessions --- prospects.
+
+**Failure handling.** Matching Workflow 10\'s v2.12 precedent, a
+stage-advance failure does not fail the calling workflow\'s primary job
+(transcription, analysis, or generation) --- it is a secondary CRM sync,
+per §8 ("HubSpot remains a view, not a store"). Each calling workflow
+alerts via its own existing Slack pattern on failure rather than
+hard-failing its main task.
+
+**Naming caveat.** Aaron flagged (2026-07-19) that "discovery scheduled"
+named the wrong moment --- Workflow 5 succeeding means the call already
+happened and was transcribed, not that it\'s upcoming --- so Decision 1
+above uses "discovery completed" instead. "analysis pending" and
+"deliverables pending" are unchanged for now, though Aaron expects to
+refine this portal\'s stage-label naming further once tailoring the CRM
+to real client work. This ADR binds to behavior --- which milestone
+advances the Deal --- not to the literal label text; the label-match
+pattern in Decision 2 means any future relabel needs no workflow code
+change, only Aaron updating the label text passed as each workflow\'s
+targetStageLabel parameter (and the matching live HubSpot stage label
+itself, per Required verification (3) below).
+
+**Required verification before implementation.** (1) Confirm Workflow
+5\'s discovery_sessions --- prospects email-resolution path is reliable
+before adding a first-ever HubSpot dependency to a workflow that
+currently has none. (2) Confirm the shared sub-workflow\'s label-match
+failure mode (stage not found) surfaces clearly rather than silently
+no-op\'ing, matching Workflow 3\'s own throw new Error(\...) precedent.
+(3) Aaron renames the live HubSpot pipeline stage currently labeled
+"discovery scheduled" to "discovery completed" (his own HubSpot config
+action) before this is built --- the label-match pattern in Decision 2
+depends on the live label matching exactly what each workflow passes as
+targetStageLabel.
+
+**Schema / capability impact.** No new Postgres schema, no new HubSpot
+properties. §7\'s workflow count is unaffected in the pipeline-workflow
+sense --- the new shared sub-workflow is not separately counted,
+matching the existing precedent that Resolve Prospect + Update Status
+and Render Deliverables PDF also aren\'t counted in "10 workflows
+total."
+
 # 8. HubSpot Integration
 
 +-----------------------------------------------------------------------+
@@ -1896,7 +2008,7 @@ columns.
 ## 8.2 Aaron\'s HubSpot Views
 
 - Pipeline overview --- prospects by stage (qualified / discovery
-  scheduled / analysis pending / deliverables pending / sent / won /
+  completed / analysis pending / deliverables pending / sent / won /
   lost / negotiating).
 
 - Gate #1 queue --- post_call_analyses with status = pending_review.
