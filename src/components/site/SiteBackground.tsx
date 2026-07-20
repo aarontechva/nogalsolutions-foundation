@@ -1,3 +1,13 @@
+/* Sparse, staggered so they never feel synchronized — dark mode only, a
+ * night-sky flourish that wouldn't read right against the light theme. */
+const shootingStars = [
+  { top: "10%", left: "18%", delay: "0s", duration: "7s" },
+  { top: "5%", left: "62%", delay: "3s", duration: "8s" },
+  { top: "38%", left: "85%", delay: "6.5s", duration: "6.5s" },
+  { top: "58%", left: "8%", delay: "10s", duration: "7.5s" },
+  { top: "24%", left: "42%", delay: "14s", duration: "9s" },
+];
+
 /* Premium, minimal ambient backdrop inspired by Apple keynote wallpapers:
  * deep charcoal base, soft crimson radial glows, vignette for focus, and
  * faint grain to prevent banding. Shared across every page for a consistent look. */
@@ -36,6 +46,13 @@ export function SiteBackground() {
               "radial-gradient(ellipse 110% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
           }}
         />
+        {shootingStars.map((s, i) => (
+          <span
+            key={i}
+            className="shooting-star"
+            style={{ top: s.top, left: s.left, animationDelay: s.delay, animationDuration: s.duration }}
+          />
+        ))}
       </div>
       {/* Grain — subtle on both themes via blend mode */}
       <div

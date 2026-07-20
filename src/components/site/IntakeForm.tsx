@@ -378,7 +378,6 @@ export function IntakeForm() {
             >
               <Textarea
                 id={`${id}-problem`}
-                placeholder="e.g. Our sales team manually copies leads from our web form into HubSpot and sends follow-up emails by hand — it takes 2 hours a day and leads fall through the cracks over weekends."
                 value={fields.problemInOperations}
                 onChange={(e) => set("problemInOperations", e.target.value)}
                 onBlur={() => touch("problemInOperations")}
@@ -401,7 +400,6 @@ export function IntakeForm() {
                 <Input
                   id={`${id}-tech`}
                   type="text"
-                  placeholder="e.g. HubSpot, Stripe, Google Sheets, Slack, custom React app"
                   value={fields.techStack}
                   onChange={(e) => set("techStack", e.target.value)}
                   onBlur={() => touch("techStack")}
