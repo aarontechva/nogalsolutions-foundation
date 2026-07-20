@@ -217,7 +217,7 @@
     oklch(0.55 0.2 18) 70%,
     oklch(0.38 0.16 18) 100%
   );
-  background-size: 250% auto;
+  background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -239,6 +239,6 @@
   50% { box-shadow: 0 0 0 14px oklch(0.45 0.18 18 / 0); }
 }
 @keyframes text-shine {
-  from { background-position: -200% center; }
-  to { background-position: 200% center; }
+  from { background-position: 0% center; }
+  to { background-position: -200% center; }
 }

@@ -83,14 +83,6 @@ function Hero() {
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           {/* Left */}
           <div className="max-w-2xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-medium text-primary">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-primary" />
-              </span>
-              AI-Powered Automation & Systems Integration
-            </div>
-
             <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl">
               Stop wasting hours on{" "}
               <span className="text-gradient-crimson">repetitive business operations.</span>
