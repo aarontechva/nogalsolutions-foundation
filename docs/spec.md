@@ -13,7 +13,7 @@ builds against.*
 | **Platform**         | Cloudflare Pages (frontend) + Supabase + n8n  |
 |                      | on Hostinger VPS + HubSpot (review surface)   |
 +----------------------+-----------------------------------------------+
-| **Status**           | v2.13 --- Locked. Deviations require version  |
+| **Status**           | v2.14 --- Locked. Deviations require version  |
 |                      | bump.                                         |
 +----------------------+-----------------------------------------------+
 | **Version**          | 2.10 --- §7c added: AI provider migration to  |
@@ -85,8 +85,21 @@ builds against.*
 |                      | at booking, sent at close), skipping every    |
 |                      | stage in between. No new Postgres schema or   |
 |                      | HubSpot properties.                           |
+|                      |                                               |
+|                      | 2.14 --- §7f added: Discovery Recording       |
+|                      | Dropzone Automation (Architecture Decision    |
+|                      | Record). A new shared sub-workflow, triggered |
+|                      | off Workflow 3, creates the                   |
+|                      | discovery-recordings/{prospect_id}/ folder    |
+|                      | directly via the Supabase Storage API and     |
+|                      | sends a Slack message with the exact path and |
+|                      | a short reference code, closing a real        |
+|                      | production mistake where Aaron used           |
+|                      | intake_submissions.id instead of prospects.id |
+|                      | creating the folder manually. No new Postgres |
+|                      | schema or HubSpot properties.                 |
 +----------------------+-----------------------------------------------+
-| **Date**             | 2026-07-19                                    |
+| **Date**             | 2026-07-20                                    |
 +----------------------+-----------------------------------------------+
 
 *If it is not in this document, it does not get built.*
@@ -1977,6 +1990,68 @@ sense --- the new shared sub-workflow is not separately counted,
 matching the existing precedent that Resolve Prospect + Update Status
 and Render Deliverables PDF also aren\'t counted in "10 workflows
 total."
+
+# 7f. Discovery Recording Dropzone Automation (Architecture Decision Record)
+
+Architecture decision record, drafted by Claude Code CLI with Aaron in
+this session (2026-07-20), following the first live exercise of §7e\'s
+Deal-stage-advance branches, which surfaced a real production mistake
+worth closing.
+
+Context. Aaron used intake_submissions.id (a different table\'s own
+primary key) instead of prospects.id when creating the
+discovery-recordings/{prospect_id}/ folder by hand, causing two Workflow
+5 executions to fail with a foreign-key violation before the correct
+folder was found. Today only Aaron conducts discovery calls and drops
+the recording himself; this ADR anticipates the process eventually
+including an employee or the client\'s own team, where a wrong-ID
+mistake becomes more likely, not less. A related, separately-found
+issue - creating a folder via Supabase Storage\'s own dashboard UI
+auto-generates a .emptyFolderPlaceholder object, which Workflow 5\'s
+trigger was treating as a real recording upload - was fixed
+independently as a defensive guard inside Workflow 5 itself, since it
+corrects existing behavior rather than adding new capability, and is not
+part of this ADR.
+
+Decision. A new shared sub-workflow, Provision Discovery Recording
+Dropzone, triggered immediately after Workflow 3 (Qualified Handoff)
+successfully creates the Deal. It creates the
+discovery-recordings/{prospect_id}/ folder directly via the Supabase
+Storage API - not the dashboard UI - using the real prospect_id read
+from the just-created booking, never typed by a human, and sends a Slack
+message naming the prospect, the exact folder path already created and
+ready to receive the file, and a short reference code (the last 6
+characters of prospect_id, uppercased) for a quick visual double-check.
+The message is written so it can be forwarded as-is to whoever is
+actually dropping the recording.
+
+Implementation note. The folder-marker object this sub-workflow creates
+is named .emptyFolderPlaceholder - the same name Supabase\'s own
+dashboard UI creates when a folder is made manually - so Workflow 5\'s
+existing guard already excludes it, with no further change required.
+
+Failure handling. Matching every other secondary-CRM/notification side
+effect in this pipeline (§7d, §7e), a failure to create the folder or
+send the Slack message does not fail Workflow 3\'s primary booking job.
+It is a non-blocking follow-on step, alerted via the existing
+failure-alert pattern if it fails.
+
+Required verification before implementation. (1) Confirm the Supabase
+Storage API call used to create the folder object authenticates the same
+way as the existing Storage writes already proven in Workflows 5 and 9.
+(2) Confirm the reference-code truncation (last 6 characters of a UUID)
+is visually distinct enough in practice to prevent mismatches between
+concurrent engagements; if two prospects happen to share the same last 6
+characters, the truncation rule can be lengthened. (3) Confirm which
+Slack destination is right - the shared pipeline-activity channel, since
+this message doubles as an actionable instruction rather than a pure
+status ping, or a direct message; Aaron\'s call.
+
+Schema / capability impact. No new Postgres schema, no new HubSpot
+properties. §7\'s workflow count is unaffected in the pipeline-workflow
+sense - the new shared sub-workflow is not separately counted, matching
+the existing precedent for Resolve Prospect + Update Status, Render
+Deliverables PDF, and Advance Deal Stage.
 
 # 8. HubSpot Integration
 
