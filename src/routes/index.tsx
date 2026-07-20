@@ -358,7 +358,7 @@ function TechStack() {
     { icon: Layers, name: "CRM Ecosystems", tools: ["GoHighLevel", "HubSpot", "Custom CRM"] },
     { icon: Bot, name: "AI Platforms", tools: ["OpenAI", "Claude", "AI Agents", "RAG", "MCP"] },
     { icon: Plug, name: "Backend Integrations", tools: ["REST APIs", "GraphQL", "OAuth", "HTTP"] },
-    { icon: Database, name: "Data Engineering", tools: ["SQL", "PostgreSQL", "Supabase", "Google Sheets"] },
+    { icon: Database, name: "Data Structures", tools: ["SQL", "PostgreSQL", "Supabase", "Google Sheets"] },
     { icon: Cloud, name: "Cloud Infrastructure", tools: ["Docker", "Linux", "Hostinger VPS", "DigitalOcean"] },
     { icon: Cpu, name: "Frontend Applications", tools: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
     { icon: BarChart3, name: "Business Intelligence", tools: ["Dashboards", "Analytics", "Reporting"] },
@@ -449,7 +449,9 @@ function WhyChoose() {
       title={(
         <>
           <span className="block">The framework behind</span>
-          <span className="mt-3 block">high-performing <span className="text-gradient-crimson">operations.</span></span>
+          <span className="mt-3 block">
+            <span className="text-gradient-crimson">high-performing operations.</span>
+          </span>
         </>
       )}
       subtitle="Technology is easy to buy. Engineering systems that actually improve a business is much harder."
