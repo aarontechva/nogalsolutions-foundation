@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { IntakeForm } from "@/components/site/IntakeForm";
 import { Section } from "@/components/site/Section";
 import { Container } from "@/components/site/Container";
+import { SiteBackground } from "@/components/site/SiteBackground";
 import {
   ArrowRight,
   Workflow,
@@ -56,64 +57,11 @@ function Index() {
       <Process />
       <WhyChoose />
       <TechStack />
-      <About />
       <ProofOfWork />
+      <About />
       <CTA />
       <IntakeForm />
       <Footer />
-    </div>
-  );
-}
-
-/* ───────────────────── SITE BACKGROUND ─────────────────────
- * Premium, minimal ambient backdrop inspired by Apple keynote
- * wallpapers: deep charcoal base, soft crimson radial glows,
- * vignette for focus, and faint grain to prevent banding.
- */
-function SiteBackground() {
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background">
-      {/* Light mode: soft, mostly-white backdrop with faint crimson glows */}
-      <div className="absolute inset-0 dark:hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.85 0.06 18 / 0.5), transparent 62%)," +
-              "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.9 0.04 18 / 0.35), transparent 68%)," +
-              "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.88 0.05 18 / 0.4), transparent 62%)",
-          }}
-        />
-      </div>
-      {/* Dark mode: deep charcoal base with crimson ambient glows + vignette */}
-      <div className="absolute inset-0 hidden dark:block">
-        <div className="absolute inset-0 bg-[#050505]" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 75% 55% at 82% 6%, oklch(0.32 0.12 18 / 0.55), transparent 62%)," +
-              "radial-gradient(ellipse 60% 50% at 12% 38%, oklch(0.22 0.09 18 / 0.38), transparent 68%)," +
-              "radial-gradient(ellipse 90% 55% at 50% 108%, oklch(0.26 0.11 18 / 0.42), transparent 62%)," +
-              "radial-gradient(ellipse 55% 40% at 78% 72%, oklch(0.20 0.08 18 / 0.30), transparent 70%)",
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 110% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
-          }}
-        />
-      </div>
-      {/* Grain — subtle on both themes via blend mode */}
-      <div
-        className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
-        }}
-      />
     </div>
   );
 }
@@ -211,7 +159,7 @@ function Hero() {
                       {/* Hardcoded white, not theme tokens — sits on the portrait photo itself,
                           which keeps its own dark/crimson backdrop regardless of site theme. */}
                       <p className="text-sm font-semibold text-white">Aaron Nogal</p>
-                      <p className="text-xs text-white/70">Founder & Systems Engineer</p>
+                      <p className="text-xs text-white/70">AI-Powered Automation Specialist and Solutions Architect</p>
                     </div>
                   </div>
                 </div>
@@ -296,7 +244,6 @@ function Challenges() {
   return (
     <Section
       id="challenges"
-      eyebrow="Business Challenges"
       title={<>The hidden tax on <span className="text-gradient-crimson">every growing business.</span></>}
       subtitle="Growing businesses shouldn't be slowed down by repetitive work, disconnected software, or operations that can't keep pace."
     >
@@ -321,7 +268,6 @@ function Solutions() {
   return (
     <Section
       id="solutions"
-      eyebrow="Solution Framework"
       title={<>Systems designed around <span className="text-gradient-crimson">business outcomes.</span></>}
       subtitle="I don't sell technology. I deliver measurable improvements to how your business runs."
     >
@@ -344,7 +290,6 @@ function Process() {
   return (
     <Section
       id="process"
-      eyebrow="My Process"
       title={<>A disciplined path from <span className="text-gradient-crimson">chaos to clarity.</span></>}
       subtitle="Every engagement follows the same engineering discipline — structured, repeatable, and built for lasting results."
     >
@@ -430,7 +375,6 @@ function TechStack() {
   return (
     <Section
       id="stack"
-      eyebrow="Technology Stack"
       title={<>The implementation layer, <span className="text-gradient-crimson">not the product.</span></>}
       subtitle="Technology is the supporting evidence — chosen and combined to fit the business, never the other way around."
     >
@@ -468,9 +412,6 @@ function About() {
           </div>
         </div>
         <div className="lg:col-span-7">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium tracking-wider text-primary uppercase">
-            <span className="size-1.5 rounded-full bg-primary" /> About
-          </div>
           <h2 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl">
             An engineer who thinks in <span className="text-gradient-crimson">business systems.</span>
           </h2>
@@ -513,11 +454,10 @@ function WhyChoose() {
   return (
     <Section
       id="why"
-      eyebrow="Why NogalSolutions"
       title={(
         <>
           <span className="block">The framework behind</span>
-          <span className="mt-3 block text-gradient-crimson">high-performing operations.</span>
+          <span className="mt-3 block">high-performing <span className="text-gradient-crimson">operations.</span></span>
         </>
       )}
       subtitle="Technology is easy to buy. Engineering systems that actually improve a business is much harder."
@@ -532,20 +472,45 @@ function WhyChoose() {
 /* ───────────────────── PROOF OF WORK ───────────────────── */
 
 function ProofOfWork() {
-  const items = [
-    { title: "AI-Assisted Pre-Sales Operations", body: "Lead qualification, enrichment, and intelligent routing — engineered end-to-end." },
-    { title: "AI-Assisted Post-Sales Operations", body: "Onboarding, follow-up, and retention workflows that run reliably in the background." },
-    { title: "Business Operations Dashboard", body: "A unified view of pipeline, performance, and operational health — built on live data." },
+  const soon = [
+    { title: "Finance and Invoice Processing", body: "Automated invoicing, payment tracking, and reconciliation — billing that runs itself instead of chasing spreadsheets." },
+    { title: "Custom Automation for your Business", body: "A tailored system built around your specific operations — for whatever doesn't fit a template yet." },
   ];
   return (
     <Section
-      id="proof"
-      eyebrow="Proof of Work"
+      id="live-systems"
       title={<>Real systems. <span className="text-gradient-crimson">Real outcomes.</span></>}
       subtitle="A closer look at production systems engineered for live business operations."
     >
       <div className="grid gap-6 md:grid-cols-3">
-        {items.map((p) => (
+        {/* Live case study — the actual system running my own consulting practice */}
+        <Link
+          to="/consultant-engagement-pipeline"
+          className="group relative flex flex-col overflow-hidden rounded-2xl border border-primary/30 bg-card p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-elegant md:col-span-3 lg:col-span-1"
+        >
+          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{
+            background: "radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.30 0.12 18 / 0.22), transparent 70%)",
+          }} />
+          <div className="relative flex flex-1 flex-col">
+            <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-primary">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-primary" />
+              </span>
+              Live System
+            </div>
+            <h3 className="text-lg font-semibold tracking-tight">Consultant Engagement Pipeline</h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              The system that runs my own consulting practice, end to end — from the first form submission to a client-ready deliverable in their inbox. Built, live, and proven on real engagements.
+            </p>
+            <div className="mt-auto flex items-center gap-1.5 pt-6 text-sm font-medium text-primary">
+              See how it works
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </div>
+        </Link>
+
+        {soon.map((p) => (
           <div key={p.title} className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-7 shadow-card">
             <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60" style={{
               background: "radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.30 0.12 18 / 0.18), transparent 70%)",

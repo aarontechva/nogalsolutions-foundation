@@ -236,7 +236,6 @@ export function IntakeForm() {
     return (
       <Section
         id="intake"
-        eyebrow="Start a Project"
         title={<>Your message is <span className="text-gradient-crimson">on its way.</span></>}
         subtitle="I review every submission personally and respond within 1 business day."
         align="center"
@@ -271,7 +270,6 @@ export function IntakeForm() {
   return (
     <Section
       id="intake"
-      eyebrow="Start a Project"
       title={
         <>
           Tell me where your{" "}
@@ -290,7 +288,6 @@ export function IntakeForm() {
                 <Input
                   id={`${id}-name`}
                   type="text"
-                  placeholder="Jane Smith"
                   value={fields.name}
                   onChange={(e) => set("name", e.target.value)}
                   onBlur={() => touch("name")}
@@ -302,7 +299,6 @@ export function IntakeForm() {
                 <Input
                   id={`${id}-email`}
                   type="email"
-                  placeholder="jane@company.com"
                   value={fields.email}
                   onChange={(e) => set("email", e.target.value)}
                   onBlur={() => touch("email")}
@@ -317,7 +313,6 @@ export function IntakeForm() {
                 <Input
                   id={`${id}-company`}
                   type="text"
-                  placeholder="Acme Inc."
                   value={fields.company}
                   onChange={(e) => set("company", e.target.value)}
                   onBlur={() => touch("company")}
@@ -476,7 +471,6 @@ export function IntakeForm() {
             >
               <Textarea
                 id={`${id}-goals`}
-                placeholder="e.g. New leads auto-enrolled in a follow-up sequence the moment they submit. Sales team only touches qualified leads. Zero manual data entry between our form and HubSpot."
                 value={fields.goalsAndOutcomes}
                 onChange={(e) => set("goalsAndOutcomes", e.target.value)}
                 onBlur={() => touch("goalsAndOutcomes")}

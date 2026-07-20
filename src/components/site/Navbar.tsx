@@ -4,13 +4,14 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/theme";
 
 const nav = [
-  { href: "#challenges", label: "Challenges" },
-  { href: "#solutions", label: "Solutions" },
-  { href: "#process", label: "Process" },
-  { href: "#why", label: "My Edge" },
-  { href: "#stack", label: "Technology" },
-  { href: "#about", label: "About" },
-  { href: "#intake", label: "Contact" },
+  { href: "/#challenges", label: "Challenges" },
+  { href: "/#solutions", label: "Solutions" },
+  { href: "/#process", label: "Process" },
+  { href: "/#why", label: "My Edge" },
+  { href: "/#stack", label: "Technology" },
+  { href: "/#live-systems", label: "Live Systems" },
+  { href: "/#about", label: "About" },
+  { href: "/#intake", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -28,11 +29,10 @@ export function Navbar() {
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
         <div className={cn(
           "flex items-center justify-between rounded-2xl px-5 py-3 transition-all duration-300",
-          scrolled ? "glass-panel shadow-card" : "bg-transparent",
+          scrolled ? "glass-panel shadow-card" : "bg-background/40",
         )}>
-          <a href="#top" className="flex items-center gap-2.5 text-foreground">
-            <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-sm font-bold text-primary-foreground shadow-glow">N</span>
-            <span className="text-base font-semibold tracking-tight">NogalSolutions</span>
+          <a href="/#top" className="flex items-center gap-2.5">
+            <span className="text-shine-crimson text-base font-semibold tracking-tight">NogalSolutions</span>
           </a>
           <nav className="hidden items-center gap-1 md:flex">
             {nav.map((n) => (
@@ -50,7 +50,7 @@ export function Navbar() {
             >
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
-            <a href="#intake" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
+            <a href="/#intake" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elegant transition-all hover:bg-primary/90 hover:shadow-glow">
               Start a Project
               <span aria-hidden>→</span>
             </a>

@@ -7,8 +7,7 @@ export function Footer() {
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-sm font-bold text-primary-foreground">N</span>
-              <span className="text-base font-semibold tracking-tight">NogalSolutions</span>
+              <span className="text-shine-crimson text-base font-semibold tracking-tight">NogalSolutions</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
               AI-powered systems engineering studio helping businesses automate operations, integrate software, and build scalable workflows.
@@ -18,23 +17,24 @@ export function Footer() {
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Explore</p>
               <ul className="space-y-2">
-                <li><a href="#solutions" className="text-foreground/80 hover:text-primary">Solutions</a></li>
-                <li><a href="#process" className="text-foreground/80 hover:text-primary">Process</a></li>
-                <li><a href="#proof" className="text-foreground/80 hover:text-primary">Proof of Work</a></li>
+                <li><a href="/#solutions" className="text-foreground/80 hover:text-primary">Solutions</a></li>
+                <li><a href="/#process" className="text-foreground/80 hover:text-primary">Process</a></li>
+                <li><a href="/#live-systems" className="text-foreground/80 hover:text-primary">Live Systems</a></li>
+                <li><a href="/consultant-engagement-pipeline" className="text-foreground/80 hover:text-primary">Case Study</a></li>
               </ul>
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Company</p>
               <ul className="space-y-2">
-                <li><a href="#stack" className="text-foreground/80 hover:text-primary">Technology</a></li>
-                <li><a href="#about" className="text-foreground/80 hover:text-primary">About</a></li>
-                <li><a href="#intake" className="text-foreground/80 hover:text-primary">Contact</a></li>
+                <li><a href="/#stack" className="text-foreground/80 hover:text-primary">Technology</a></li>
+                <li><a href="/#about" className="text-foreground/80 hover:text-primary">About</a></li>
+                <li><a href="/#intake" className="text-foreground/80 hover:text-primary">Contact</a></li>
               </ul>
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Get in touch</p>
               <div className="flex flex-col gap-3">
-                <a href="#intake" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                <a href="/#intake" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
                   Start a Project →
                 </a>
                 <div className="flex flex-wrap gap-3">
