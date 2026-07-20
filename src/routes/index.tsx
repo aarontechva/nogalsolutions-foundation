@@ -20,7 +20,6 @@ import {
   Boxes,
   GitBranch,
   LineChart,
-  Zap,
   Search,
   PenTool,
   Hammer,
@@ -155,20 +154,6 @@ function Hero() {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Floating badges */}
-            <div className="absolute -left-6 top-10 hidden rounded-2xl border border-border/80 bg-card/90 p-3 shadow-card backdrop-blur md:flex">
-              <div className="flex items-center gap-2 px-2 text-xs">
-                <Zap className="size-4 text-primary" /> Workflows live in 4 weeks
-              </div>
-            </div>
-            {/* bottom-36 is a hardcoded offset bump (was bottom-24) so this badge clears the
-                name/title overlay card pinned to the bottom of the portrait. */}
-            <div className="absolute -right-4 bottom-36 hidden rounded-2xl border border-border/80 bg-card/90 p-3 shadow-card backdrop-blur md:flex">
-              <div className="flex items-center gap-2 px-2 text-xs">
-                <Activity className="size-4 text-primary" /> Always-on monitoring
               </div>
             </div>
           </div>
