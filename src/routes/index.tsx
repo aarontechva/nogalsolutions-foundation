@@ -31,6 +31,7 @@ import {
   Handshake,
   Infinity as InfinityIcon,
   Clock,
+  Download,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -571,6 +572,14 @@ function CTA() {
               >
                 Start a Project
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href="/resources/aaron-nogal-ai-automation-specialist-resume.pdf"
+                download="Aaron-Nogal-AI-Automation-Specialist-Resume.pdf"
+                className="group inline-flex items-center gap-2 rounded-xl border border-white/35 bg-white/10 px-6 py-3.5 text-base font-medium text-white shadow-card backdrop-blur-sm transition-all hover:translate-y-[-1px] hover:border-white/60 hover:bg-white/20"
+              >
+                Download My Resume
+                <Download className="size-4 transition-transform group-hover:translate-y-0.5" />
               </a>
             </div>
           </div>
