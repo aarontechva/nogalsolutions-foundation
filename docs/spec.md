@@ -2053,6 +2053,133 @@ sense - the new shared sub-workflow is not separately counted, matching
 the existing precedent for Resolve Prospect + Update Status, Render
 Deliverables PDF, and Advance Deal Stage.
 
+# 7g. Outbound Discovery Bootstrap (Architecture Decision Record)
+
+Architecture decision record, drafted by Claude Code CLI with Aaron in
+this session (2026-07-21), building on the outbound-entry-route design
+Codex produced on 2026-07-20 (Baton-Pass 137) and this session\'s own
+live-inspection review of it.
+
+Context. Every prospect currently enters the pipeline through the
+website intake form (Workflows 1-4), which assumes the client is the one
+who found NogalSolutions and submitted a form. Aaron also wants to
+pursue prospects he sources directly - cold outreach, referrals,
+networking - where he books the call himself and the client will
+typically host the Zoom/Google Meet, so no website form submission ever
+happens. Workflow 6 (Post-Call Analysis) already depends on an
+intake_submissions.payload row existing for the prospect - it fetches
+the latest one and falls back to an empty object if none exists,
+silently degrading Prompt A\'s context quality rather than failing
+loudly. An outbound entry route therefore cannot simply drop a recording
+into Workflow 5; it must first create the same Supabase and HubSpot
+context the website-form path builds automatically, or Workflow 6
+quietly loses input it currently always has.
+
+Decision. A new workflow, Outbound Discovery Bootstrap, triggered by a
+private (non-public) n8n Form Trigger that Aaron fills in himself after
+deciding to open a discovery-call route with a prospect he found. It
+performs, in order: (1) find-or-create the company by domain/name, and
+find-or-create the prospect by exact email match; (2) insert an
+intake_submissions row carrying Aaron\'s outreach notes as context,
+tagged by source (see Schema impact below) so it is never mistaken for a
+real website submission; (3) upsert the HubSpot Contact and
+find-or-create the Company; (4) dynamically resolve the qualified
+Deal-stage ID and the Contact/Company association type IDs, the same way
+Workflow 3 already does, and create the Deal - reusing an existing open
+Deal for that Contact if one exists, rather than creating a duplicate
+(see \"Returning prospect\" below); (5) call the existing \"Provision
+Discovery Recording Dropzone\" shared sub-workflow and Slack Aaron the
+folder path and reference code, identical to Workflow 3\'s own use of
+it; (6) append an activity_logs entry recording the bootstrap event.
+From here the prospect converges into the existing pipeline unchanged -
+Aaron records the call (bot-free, Krisp or Otter Desktop, per \"Consent
+and disclosure\" below), uploads the file into the provisioned folder,
+and Workflows 5 through 10 run exactly as they do today.
+
+No automated qualification (Workflow 2) runs for this route. Aaron\'s
+own decision to open an outbound discovery conversation with a specific
+prospect is the qualification gate - he does not cold-call unqualified
+leads. See \"Qualification-bypass rationale\" below.
+
+No AI Agent, LLM Chain, or other non-deterministic node performs
+identity resolution, matching, association, or provisioning in this
+workflow - every one of those operations uses exact deterministic keys
+(email for prospect/Contact matching, domain or exact name for company
+matching), matching this pipeline\'s existing standing convention that
+identity-critical CRM writes are never left to a model\'s judgment.
+
+Implementation note - reuse over rebuild. Workflow 3\'s own
+identity-resolution-and-Deal-creation logic (Contact upsert, Company
+find-or-create, pipeline-stage lookup, both association-type-ID lookups,
+Deal creation - roughly 10 of Workflow 3\'s 21 nodes) is the same logic
+this workflow needs. Recommended sequencing: build the Outbound
+Discovery Bootstrap standalone first, matching Workflow 3\'s proven
+node-for-node pattern rather than sharing a sub-workflow with it, so
+this new build can be reviewed and proven in isolation without touching
+a live, active workflow. Once both routes are live and independently
+proven, extracting that shared block into its own sub-workflow
+(following this project\'s existing precedent - Resolve Prospect,
+Advance Deal Stage, and Provision Discovery Recording Dropzone were all
+built once and then extracted) is a worthwhile follow-up refactor, but
+it is explicitly out of scope for this ADR and should be its own
+separately reviewed change against Workflow 3.
+
+Failure handling. Same pattern as every other workflow in this pipeline:
+each phase (Supabase writes, HubSpot writes, dropzone provisioning)
+fails loudly with a Slack alert on error rather than continuing on
+partial state; no partial-write guarantee is weaker than what Workflows
+3-10 already provide.
+
+Returning prospect. If find-or-create locates an existing
+prospect/Contact by email, reuse the existing Contact and Company, and
+reuse an existing open Deal for that Contact if one exists rather than
+creating a second one; only create a new Deal if none is currently open.
+This applies the same way regardless of how the existing record
+originated - a prior inbound submission that never qualified is treated
+identically to a prior outbound attempt; prior history is useful context
+for the new engagement, not a reason to fork the identity-resolution
+behavior. Confirmed by Aaron (2026-07-21).
+
+Qualification-bypass rationale. Aaron\'s own decision to initiate
+outbound contact is a sufficient substitute for Workflow 2\'s rule-based
+qualification, and no qualification_results row is written for outbound
+prospects. Confirmed safe: qualification_results has no downstream
+foreign-key dependents (checked directly against the live schema) -
+nothing later in the pipeline requires a qualification_results row to
+exist. Confirmed by Aaron (2026-07-21).
+
+Consent and disclosure. The private outbound form includes a required
+checkbox confirming Aaron has disclosed, or will disclose before
+recording starts, that the call will be recorded and transcribed, logged
+as an activity_logs entry (event_type: outbound_consent_confirmed) at
+bootstrap time. Confirmed by Aaron (2026-07-21).
+
+Private form fields. Prospect full name, email (required, used as the
+dedupe key), company name, company website (optional), Aaron\'s
+outreach/context notes (free text, becomes the intake_submissions
+payload), and the consent checkbox from the decision above. Confirmed by
+Aaron (2026-07-21).
+
+Required verification before implementation. (1) Confirm the \"Provision
+Discovery Recording Dropzone\" sub-workflow\'s Execute Workflow contract
+(expected input fields) matches what this new workflow will pass -
+re-fetch it directly rather than assuming Workflow 3\'s exact shape
+carries over unchanged. (2) Confirm the private Form Trigger is not
+publicly discoverable (no link exposed anywhere on the public website)
+before activation.
+
+Schema / capability impact. New Postgres enum intake_source with values
+website and outbound_discovery; new column intake_submissions.source
+intake_source not null default \'website\' (backward-compatible default
+preserves every existing row\'s meaning without a data migration).
+Workflow 6\'s existing intake_submissions.payload fetch is unchanged -
+it already tolerates an empty object and needs no code change to also
+tolerate an outbound-sourced payload. §7\'s workflow count is unaffected
+in the pipeline-workflow sense per the existing
+shared-sub-workflow-doesn\'t-count precedent, but Outbound Discovery
+Bootstrap itself is a new primary workflow (not a shared sub-workflow),
+the first new entry point since Workflow 4.
+
 # 8. HubSpot Integration
 
 +-----------------------------------------------------------------------+
