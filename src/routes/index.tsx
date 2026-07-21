@@ -395,22 +395,11 @@ function About() {
           </h2>
           <div className="mt-7 space-y-5 text-lg leading-relaxed text-muted-foreground">
             <p>
-              I'm Aaron Nogal — a systems engineer focused on architecture-first automation, integrations, and AI systems that hold up in production.
+              I'm Aaron Nogal — An AI Automation Specialist focused on architecture-first approach, integrations, and AI systems that hold up in production.
             </p>
             <p>
-              Every project is measured by one standard: did it create a measurable, lasting business outcome?
+              Every project is measured by one standard: Did it create a measurable, lasting business outcome?
             </p>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {[
-              { v: "Architecture-first" },
-              { v: "Production-grade" },
-              { v: "Outcome-driven" },
-            ].map((p) => (
-              <div key={p.v} className="rounded-xl border border-primary/20 bg-primary/[0.06] px-4 py-3 text-center">
-                <p className="text-sm font-semibold tracking-tight text-foreground">{p.v}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>
