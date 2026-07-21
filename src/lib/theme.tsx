@@ -6,11 +6,43 @@ export type Theme = "light" | "dark";
 
 const STORAGE_KEY = "nogal-theme";
 
+let themeCleanupFrame: number | undefined;
+
 const setHtmlThemeClass = (theme: Theme) => {
   const root = document.documentElement;
   root.classList.toggle("light", theme === "light");
   root.classList.toggle("dark", theme === "dark");
   root.style.colorScheme = theme;
+};
+
+interface ThemeTransitionDocument extends Document {
+  startViewTransition?: (update: () => void) => unknown;
+}
+
+const runThemeTransition = (update: () => void) => {
+  const root = document.documentElement;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const applyUpdate = () => {
+    if (themeCleanupFrame !== undefined) {
+      window.cancelAnimationFrame(themeCleanupFrame);
+    }
+
+    root.classList.add("theme-switching");
+    update();
+    themeCleanupFrame = window.requestAnimationFrame(() => {
+      root.classList.remove("theme-switching");
+      themeCleanupFrame = undefined;
+    });
+  };
+
+  const startViewTransition = (document as ThemeTransitionDocument).startViewTransition;
+  if (!prefersReducedMotion && typeof startViewTransition === "function") {
+    startViewTransition.call(document, applyUpdate);
+    return;
+  }
+
+  applyUpdate();
 };
 
 interface ThemeContextValue {
@@ -33,7 +65,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = React.useCallback((next: Theme) => {
     setThemeState(next);
-    setHtmlThemeClass(next);
+    runThemeTransition(() => setHtmlThemeClass(next));
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {

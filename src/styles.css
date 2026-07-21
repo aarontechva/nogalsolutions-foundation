@@ -74,7 +74,7 @@
   --card-foreground: oklch(0.98 0.003 20);
   --popover: oklch(0.11 0.008 20);
   --popover-foreground: oklch(0.98 0.003 20);
-  --primary: oklch(0.45 0.18 18);          /* crimson #A10D24 */
+  --primary: oklch(0.45 0.18 18); /* crimson #A10D24 */
   --primary-foreground: oklch(0.99 0 0);
   --primary-glow: oklch(0.58 0.22 20);
   --secondary: oklch(0.16 0.01 20);
@@ -89,7 +89,11 @@
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.45 0.18 18);
 
-  --gradient-hero: radial-gradient(ellipse 90% 80% at 75% 25%, oklch(0.55 0.22 18 / 0.85) 0%, transparent 55%), radial-gradient(ellipse 60% 60% at 20% 75%, oklch(0.38 0.14 18 / 0.45) 0%, transparent 55%), radial-gradient(ellipse 100% 70% at 50% 100%, oklch(0.45 0.18 18 / 0.35) 0%, transparent 50%), linear-gradient(180deg, oklch(0.22 0.06 18) 0%, oklch(0.08 0.005 20) 100%);
+  --gradient-hero:
+    radial-gradient(ellipse 90% 80% at 75% 25%, oklch(0.55 0.22 18 / 0.85) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 20% 75%, oklch(0.38 0.14 18 / 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 70% at 50% 100%, oklch(0.45 0.18 18 / 0.35) 0%, transparent 50%),
+    linear-gradient(180deg, oklch(0.22 0.06 18) 0%, oklch(0.08 0.005 20) 100%);
   --gradient-crimson: linear-gradient(135deg, oklch(0.45 0.18 18) 0%, oklch(0.32 0.16 18) 100%);
   --gradient-portrait: linear-gradient(135deg, oklch(0.45 0.18 18) 0%, oklch(0.05 0 0) 100%);
   --shadow-elegant: 0 30px 80px -20px oklch(0.45 0.18 18 / 0.35);
@@ -155,20 +159,23 @@
     border-color: var(--color-border);
   }
 
-  *, *::before, *::after {
-    transition: background-color 200ms ease;
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: none !important;
   }
 
-  .glass-panel,
-  [class*="backdrop-blur"],
-  svg,
-  svg * {
-    transition: none;
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 140ms;
+    animation-timing-function: ease-out;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      transition: none;
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
     }
   }
 
@@ -184,7 +191,10 @@
     font-feature-settings: "ss01", "cv11";
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
@@ -230,14 +240,29 @@
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.45 0.18 18 / 0.5); }
-  50% { box-shadow: 0 0 0 14px oklch(0.45 0.18 18 / 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.45 0.18 18 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 14px oklch(0.45 0.18 18 / 0);
+  }
 }
 @keyframes text-shine {
-  from { background-position: 0% center; }
-  to { background-position: -200% center; }
+  from {
+    background-position: 0% center;
+  }
+  to {
+    background-position: -200% center;
+  }
 }
