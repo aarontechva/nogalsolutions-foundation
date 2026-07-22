@@ -343,37 +343,78 @@ function TechStack() {
     { icon: Workflow, name: "Workflow Automation", tools: ["n8n", "Zapier", "Make", "Webhooks"] },
     { icon: Layers, name: "CRM Ecosystems", tools: ["GoHighLevel", "HubSpot", "Custom CRM"] },
     { icon: Bot, name: "AI Platforms", tools: ["OpenAI", "Claude", "AI Agents", "RAG", "MCP"] },
-    { icon: Plug, name: "Backend Integrations", tools: ["REST APIs", "GraphQL", "OAuth", "HTTP"] },
-    { icon: Database, name: "Data Structures", tools: ["SQL", "PostgreSQL", "Supabase", "Google Sheets"] },
-    { icon: Cloud, name: "Cloud Infrastructure", tools: ["Docker", "Linux", "Hostinger VPS", "DigitalOcean"] },
+    { icon: Plug, name: "Backend Integrations", tools: ["REST APIs", "OAuth", "HTTP"] },
+    { icon: Database, name: "Data Structures", tools: ["SQL", "PostgreSQL", "Supabase", "Google Workspace"] },
+    { icon: Cloud, name: "Cloud Infrastructure", tools: ["Docker", "Linux", "Hostinger VPS"] },
     { icon: Cpu, name: "Frontend Applications", tools: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
     { icon: BarChart3, name: "Business Intelligence", tools: ["Dashboards", "Analytics", "Reporting"] },
     { icon: Boxes, name: "System Architecture", tools: ["Solution Architecture", "Workflow Design", "Process Mapping", "Integration Architecture"] },
   ];
+
+  const technologies = groups.flatMap((group) =>
+    group.tools.map((name) => ({ name, icon: group.icon })),
+  );
+
+  const renderTechnologyCards = () =>
+    technologies.map((technology) => {
+      const Icon = technology.icon;
+
+      return (
+        <div
+          key={technology.name}
+          role="listitem"
+          className="group flex h-16 shrink-0 items-center gap-3 rounded-xl border border-border/80 bg-card/70 px-5 shadow-card backdrop-blur-sm transition-colors hover:border-primary/50 hover:bg-card"
+        >
+          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+            <Icon className="size-4" aria-hidden />
+          </span>
+          <span className="whitespace-nowrap text-sm font-semibold tracking-tight text-foreground/90">
+            {technology.name}
+          </span>
+        </div>
+      );
+    });
+
   return (
-    <Section
-      id="stack"
-      title={<>The implementation layer, <span className="text-gradient-crimson">not the product.</span></>}
-      subtitle="Technology is the supporting evidence — chosen and combined to fit the business, never the other way around."
-    >
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {groups.map((g) => (
-          <div key={g.name} className="group rounded-2xl border border-border/80 bg-card/60 p-6 transition-all hover:border-primary/40 hover:bg-card">
-            <div className="flex items-center gap-3">
-              <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <g.icon className="size-5" />
-              </div>
-              <p className="text-sm font-semibold tracking-tight">{g.name}</p>
-            </div>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {g.tools.map((t) => (
-                <span key={t} className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80">{t}</span>
-              ))}
-            </div>
+    <section id="stack" className="relative overflow-hidden border-y border-border/60 py-24 lg:py-32">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 55% 70% at 50% 55%, oklch(0.45 0.18 18 / 0.12), transparent 70%)",
+        }}
+      />
+
+      <Container>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+            The implementation layer, <span className="text-gradient-crimson">not the product.</span>
+          </h2>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
+            Technology is the supporting evidence, and each tool is chosen and combined to fit the business, never the other way around.
+          </p>
+        </div>
+      </Container>
+
+      <div
+        className="technology-marquee mt-14"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+        }}
+        aria-label="Tools and technologies"
+      >
+        <div className="technology-marquee-track">
+          <div role="list" className="flex shrink-0 gap-4 pr-4">
+            {renderTechnologyCards()}
           </div>
-        ))}
+          <div aria-hidden className="technology-marquee-copy flex shrink-0 gap-4 pr-4">
+            {renderTechnologyCards()}
+          </div>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }
 

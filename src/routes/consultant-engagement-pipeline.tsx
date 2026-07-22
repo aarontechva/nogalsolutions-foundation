@@ -35,6 +35,7 @@ function ConsultantEngagementPipeline() {
       <SiteBackground />
       <Navbar />
       <CaseStudyHero />
+      <SystemSummary />
       <HowItWorks />
       <ClosingCTA />
       <Footer />
@@ -108,6 +109,29 @@ function CaseStudyHero() {
 
 /* ───────────────────── HOW IT WORKS (TABS) ───────────────────── */
 
+function SystemSummary() {
+  return (
+    <section className="relative pb-8 lg:pb-12">
+      <Container>
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            What the system does
+          </p>
+          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight md:text-3xl">
+            It turns a consulting engagement into one connected, repeatable operation.
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-muted-foreground md:text-xl">
+            From the first enquiry through qualification, discovery-call analysis, proposal
+            creation, revisions, delivery, and CRM updates, the system moves the right information
+            to the next step automatically. That means less time copying data between tools, chasing
+            handoffs, writing the same documents from scratch, and updating records by
+            hand&mdash;while the decisions that need human judgment stay firmly with people.
+          </p>
+        </div>
+      </Container>
+    </section>
+  );
+}
 function HowItWorks() {
   return (
     <Section
