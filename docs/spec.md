@@ -1176,6 +1176,22 @@ Required verification before implementation. (1) Confirm the exact type_payload 
 
 Schema / capability impact. One new HubSpot Deal pipeline stage (awaiting deposit) — created and confirmed live, internal ID 4042373864. amount_manually_set (boolean) — created and confirmed live, already in use by Workflow 9's sync branch. Two more new HubSpot Deal properties needed for this correction: a Deposit Confirmed checkbox and a Deposit Amount Received number field — not yet created, exact naming finalized at build time under this project’s standing HubSpot config-change gate. No environment variables needed — STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET, added in the original v2.17 pass, are removed in this correction (§11) since no payment-processor API integration exists in this design anymore. No new Postgres schema. §7’s “10 workflows total” remains unaffected — these are new workflows outside that numbered sequence, the same precedent §7g's Outbound Discovery Bootstrap already established.
 
+# 7j. Kickoff Prep (Architecture Decision Record)
+
+Architecture decision record, drafted by Claude Code CLI with Aaron in this session (2026-07-25), extending the deposit-gated closing flow (§7i) with an AI-drafted kickoff-call agenda.
+
+Context. §7i's Send Onboarding Kit ends the automated portion of closing a deal — the client has the welcome message, contract copy, and receipt — but the actual kickoff call still needs a real conversation between Aaron and the client, and until now Aaron would prepare an agenda for that call by hand, re-reading through the 7 approved deliverables himself. This mirrors the exact problem §7h already solved for discovery-call prep, just one stage later in the pipeline.
+
+Decision. A new workflow, Kickoff Prep, is called via Execute Workflow from the end of Send Onboarding Kit's success path (§7i piece 4) — no separate HubSpot trigger, since n8n calls it directly once onboarding is confirmed sent. It fetches the prospect's 7 approved deliverables from Supabase (latest version per type, matching the dedupe-by-latest-version pattern already used by Workflow 9/the shared renderer), assembles their content (scope, timeline, pricing, architecture, SOP, T&Cs) into a single context payload, and runs it through an LLM Chain (OpenRouter, DeepSeek V4 Flash — a lightweight drafting task, not the same quality bar as B1–B7's client-facing deliverable generation) with a Structured Output Parser enforcing a fixed agenda schema (goals recap, key milestones/timeline, deliverables overview, proposed first check-in cadence, open questions to raise on the call). The result is formatted and posted to the existing \#pipeline-activity Slack channel (already used by Notify Expected Deposit) for Aaron to review and personalize before the actual call — nothing is sent to the client automatically.
+
+Rule 2 (AI prepares, humans decide) applies exactly as it does at every other AI-touched point in this pipeline: the agenda is a draft, not a client-facing artifact, and the kickoff call itself remains a real human conversation this system makes no attempt to run or replace.
+
+Failure handling. A failure here (missing deliverables, model output failure, Slack post failure) alerts to the existing failure-alert channel and has no effect on anything upstream — Send Onboarding Kit's own success is already complete and independent by the time this workflow is called.
+
+Required verification before implementation. (1) Confirm all 7 deliverable types are reliably present and approved by the time Send Onboarding Kit fires. (2) Confirm DeepSeek V4 Flash with a Structured Output Parser produces a reliably well-formed agenda schema, matching §7h's own proven pattern.
+
+Schema / capability impact. No new Postgres schema. No new HubSpot properties or workflows. No new Slack channel — reuses \#pipeline-activity. §7's "10 workflows total" remains unaffected — new workflow outside that numbered sequence, same precedent as §7g/§7i.
+
 # 8. HubSpot Integration
 
 <table>
