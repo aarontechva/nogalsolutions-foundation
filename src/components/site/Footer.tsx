@@ -7,42 +7,85 @@ export function Footer() {
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="text-shine-crimson text-base font-semibold tracking-tight">NogalSolutions</span>
+              <span className="text-shine-crimson text-base font-semibold tracking-tight">
+                NogalSolutions
+              </span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-              AI-powered systems engineering studio helping businesses automate operations, integrate software, and build scalable workflows.
+              AI-powered systems engineering studio helping businesses automate operations,
+              integrate software, and build scalable workflows.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 text-sm md:grid-cols-3">
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Explore</p>
               <ul className="space-y-2">
-                <li><a href="/#solutions" className="text-foreground/80 hover:text-primary">Solutions</a></li>
-                <li><a href="/#process" className="text-foreground/80 hover:text-primary">Process</a></li>
-                <li><a href="/#live-systems" className="text-foreground/80 hover:text-primary">Live Systems</a></li>
-                <li><a href="/consultant-engagement-pipeline" className="text-foreground/80 hover:text-primary">Case Study</a></li>
+                <li>
+                  <a href="/#solutions" className="text-foreground/80 hover:text-primary">
+                    Solutions
+                  </a>
+                </li>
+                <li>
+                  <a href="/#process" className="text-foreground/80 hover:text-primary">
+                    Process
+                  </a>
+                </li>
+                <li>
+                  <a href="/#live-systems" className="text-foreground/80 hover:text-primary">
+                    Live Systems
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Company</p>
               <ul className="space-y-2">
-                <li><a href="/#stack" className="text-foreground/80 hover:text-primary">Technology</a></li>
-                <li><a href="/#about" className="text-foreground/80 hover:text-primary">About</a></li>
-                <li><a href="/#intake" className="text-foreground/80 hover:text-primary">Contact</a></li>
+                <li>
+                  <a href="/#stack" className="text-foreground/80 hover:text-primary">
+                    Technology
+                  </a>
+                </li>
+                <li>
+                  <a href="/#about" className="text-foreground/80 hover:text-primary">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="/#intake" className="text-foreground/80 hover:text-primary">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
-              <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Get in touch</p>
+              <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">
+                Get in touch
+              </p>
               <div className="flex flex-col gap-3">
-                <a href="/#intake" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                <a
+                  href="/#intake"
+                  className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90"
+                >
                   Start a Project →
                 </a>
                 <div className="flex flex-wrap gap-3">
                   <Button asChild variant="secondary" size="default">
-                    <a href="https://www.linkedin.com/in/aaron-nogal" target="_blank" rel="noreferrer">LinkedIn</a>
+                    <a
+                      href="https://www.linkedin.com/in/aaron-nogal"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      LinkedIn
+                    </a>
                   </Button>
                   <Button asChild variant="secondary" size="default">
-                    <a href="https://www.upwork.com/freelancers/~015a9f13d7c1fce814?mp_source=share" target="_blank" rel="noreferrer">Upwork</a>
+                    <a
+                      href="https://www.upwork.com/freelancers/~015a9f13d7c1fce814?mp_source=share"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Upwork
+                    </a>
                   </Button>
                 </div>
               </div>

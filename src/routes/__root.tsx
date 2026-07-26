@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NogalSolutions — AI-Powered Automation & Systems Integration" },
+      { title: "NogalSolutions: AI-Powered Automation & Systems Integration" },
       { name: "description", content: "Stop wasting hours on repetitive business operations. NogalSolutions automates workflows, integrates your systems, and scales operations with AI." },
       { name: "author", content: "Aaron Nogal" },
-      { property: "og:title", content: "NogalSolutions — AI-Powered Automation & Systems Integration" },
+      { property: "og:title", content: "NogalSolutions: AI-Powered Automation & Systems Integration" },
       { property: "og:description", content: "Automate repetitive work. Connect your business systems. Scale with intelligent workflows." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

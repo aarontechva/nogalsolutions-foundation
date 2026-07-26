@@ -266,6 +266,23 @@
     background-position: -200% center;
   }
 }
+/* The Solutions phone's story-style progress segment: scales from 0 to full width
+   over the auto-advance interval, restarted each cycle by keying the element on the
+   active index in index.tsx rather than by resetting this animation directly. */
+@keyframes segment-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .segment-fill {
+    animation: none !important;
+    transform: scaleX(1) !important;
+  }
+}
 
 .technology-marquee {
   overflow: hidden;

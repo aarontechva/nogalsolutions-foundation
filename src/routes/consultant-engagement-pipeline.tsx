@@ -7,18 +7,32 @@ import { Container } from "@/components/site/Container";
 import { SiteBackground } from "@/components/site/SiteBackground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  FileText,
+  CheckCircle2,
+  Phone,
+  Layers,
+  Rocket,
+} from "lucide-react";
 
 export const Route = createFileRoute("/consultant-engagement-pipeline")({
   head: () => ({
     meta: [
-      { title: "Consultant Engagement Pipeline — Live Systems | NogalSolutions" },
+      { title: "Consultant Engagement Pipeline: Live Systems | NogalSolutions" },
       {
         name: "description",
         content:
-          "The 18-workflow automation system running NogalSolutions' own consulting practice end-to-end — from intake to a client-ready deliverable, live and proven in production.",
+          "The 18-workflow automation system running NogalSolutions' own consulting practice end-to-end, from intake to a client-ready deliverable, live and proven in production.",
       },
-      { property: "og:title", content: "Consultant Engagement Pipeline — Live Systems | NogalSolutions" },
+      {
+        property: "og:title",
+        content: "Consultant Engagement Pipeline: Live Systems | NogalSolutions",
+      },
       {
         property: "og:description",
         content:
@@ -35,8 +49,8 @@ function ConsultantEngagementPipeline() {
       <SiteBackground />
       <Navbar />
       <CaseStudyHero />
-      <SystemSummary />
       <HowItWorks />
+      <PaymentOnboardingKickoff />
       <ClosingCTA />
       <Footer />
     </div>
@@ -50,6 +64,14 @@ const heroStats = [
   { v: "< 10 min", l: "to generate all 7 deliverables" },
   { v: "3–5 days", l: "of manual work eliminated" },
   { v: "2", l: "human review gates, by design" },
+];
+
+const pipelineStages = [
+  { icon: FileText, title: "Intake", caption: "Form submitted, no account needed" },
+  { icon: CheckCircle2, title: "Qualify", caption: "Auto-scored, zero human triage" },
+  { icon: Phone, title: "Discovery Call", caption: "The one deliberately human step" },
+  { icon: Layers, title: "Build", caption: "All 7 deliverables generated & gated" },
+  { icon: Rocket, title: "Close & Onboard", caption: "Deposit verified, kickoff drafted" },
 ];
 
 function CaseStudyHero() {
@@ -74,32 +96,77 @@ function CaseStudyHero() {
           <ArrowLeft className="size-3.5" /> Back to NogalSolutions
         </Link>
 
-        <div className="max-w-3xl">
-          <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl">
-            The <span className="text-gradient-crimson">Consultant Engagement Pipeline.</span>
-          </h1>
+        {/* Two columns from lg up: pitch on the left, a compact visual pipeline
+            timeline on the right — fills the space beside the H1 without piling
+            more paragraphs next to it. The actual "how it works" deep dive lives
+            in the tabs section right below this hero. Below lg they stack. */}
+        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl">
+              The <span className="text-gradient-crimson">Consultant Engagement Pipeline.</span>
+            </h1>
 
-          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            The system I built to run my own consulting practice — from a stranger filling out a form to a client-ready deliverable landing in their inbox, with almost nothing touched by hand in between.
-          </p>
+            <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+              The system I built to run my own consulting practice, going from a stranger filling
+              out a form to a client-ready deliverable landing in their inbox, with almost nothing
+              touched by hand in between.
+            </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <a
-              href="/#intake"
-              className="group inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-medium text-primary-foreground shadow-elegant transition-all hover:translate-y-[-1px] hover:bg-primary/90 hover:shadow-glow"
-            >
-              Start a Project
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </a>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <a
+                href="/#intake"
+                className="group inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-base font-medium text-primary-foreground shadow-elegant transition-all hover:translate-y-[-1px] hover:bg-primary/90 hover:shadow-glow"
+              >
+                Start a Project
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </div>
+
+            <div className="mt-14 grid grid-cols-2 gap-6 border-t border-border/60 pt-8 sm:grid-cols-4">
+              {heroStats.map((s) => (
+                <div key={s.l}>
+                  <div className="text-2xl font-semibold tracking-tight md:text-3xl">{s.v}</div>
+                  <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.l}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-14 grid grid-cols-2 gap-6 border-t border-border/60 pt-8 sm:grid-cols-4">
-            {heroStats.map((s) => (
-              <div key={s.l}>
-                <div className="text-2xl font-semibold tracking-tight md:text-3xl">{s.v}</div>
-                <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.l}</div>
-              </div>
-            ))}
+          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card/60 p-8 shadow-card backdrop-blur-sm md:p-10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 75% 65% at 85% 0%, oklch(0.45 0.18 18 / 0.14), transparent 65%)",
+              }}
+            />
+            <div className="relative">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                The Pipeline
+              </p>
+              <ol className="mt-6">
+                {pipelineStages.map((stage, i) => (
+                  <li key={stage.title} className="relative flex gap-4 pb-7 last:pb-0">
+                    {i < pipelineStages.length - 1 && (
+                      <span
+                        aria-hidden
+                        className="absolute left-5 top-10 h-[calc(100%-2rem)] w-px -translate-x-1/2 bg-border/70"
+                      />
+                    )}
+                    <div className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full border border-primary/30 bg-primary/10 text-primary">
+                      <stage.icon className="size-4" />
+                    </div>
+                    <div className="pt-1.5">
+                      <p className="text-sm font-semibold tracking-tight">{stage.title}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                        {stage.caption}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </div>
       </Container>
@@ -108,30 +175,6 @@ function CaseStudyHero() {
 }
 
 /* ───────────────────── HOW IT WORKS (TABS) ───────────────────── */
-
-function SystemSummary() {
-  return (
-    <section className="relative pb-8 lg:pb-12">
-      <Container>
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            What the system does
-          </p>
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight md:text-3xl">
-            It turns a consulting engagement into one connected, repeatable operation.
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-muted-foreground md:text-xl">
-            From the first enquiry through qualification, discovery-call analysis, proposal
-            creation, revisions, delivery, and CRM updates, the system moves the right information
-            to the next step automatically. That means less time copying data between tools, chasing
-            handoffs, writing the same documents from scratch, and updating records by
-            hand&mdash;while the decisions that need human judgment stay firmly with people.
-          </p>
-        </div>
-      </Container>
-    </section>
-  );
-}
 function HowItWorks() {
   return (
     <Section
@@ -212,7 +255,9 @@ function Carousel({ slides }: { slides: CarouselSlide[] }) {
         <div className="max-w-md text-center">
           <p className="text-sm font-semibold tracking-tight">{current.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{current.caption}</p>
-          <p className="mt-2 text-[11px] text-muted-foreground">{index + 1} / {total}</p>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            {index + 1} / {total}
+          </p>
         </div>
 
         <button
@@ -247,7 +292,8 @@ const clientJourneySlides: CarouselSlide[] = [
   {
     src: "/case-study/client-journey/intake-form-submission.png",
     title: "Submit a short intake form",
-    caption: "Two minutes, no account needed — tell me about the business and the problem worth solving.",
+    caption:
+      "Two minutes, no account needed, just tell me about the business and the problem worth solving.",
   },
   {
     src: "/case-study/client-journey/1-auto-ack-email.png",
@@ -257,22 +303,25 @@ const clientJourneySlides: CarouselSlide[] = [
   {
     src: "/case-study/client-journey/2-booking-email-sent-qualified.png",
     title: "Qualified → booking email sent",
-    caption: "The system scores the request and sends a booking link automatically — no human triage needed.",
+    caption:
+      "The system scores the request and sends a booking link automatically, with no human triage needed.",
   },
   {
     src: "/case-study/client-journey/2.1-respectful-decline-unqualified.png",
     title: "Not a fit → respectful decline",
-    caption: "The alternate branch when a request isn't qualified yet — still a clean, human-toned response, not silence.",
+    caption:
+      "The alternate branch when a request isn't qualified yet, but still a clean, human-toned response, not silence.",
   },
   {
     src: "/case-study/client-journey/3-calendar-booking-with-calendly.png",
     title: "Discovery call gets booked",
-    caption: "A real conversation — the one deliberately human step in the whole process.",
+    caption: "A real conversation, the one deliberately human step in the whole process.",
   },
   {
     src: "/case-study/client-journey/4-finalized-proposal-handoff-email-with-attached-file.png",
     title: "Final proposal delivered",
-    caption: "One polished, branded package lands in their inbox — not a folder of disconnected files.",
+    caption:
+      "One polished, branded package lands in their inbox, not a folder of disconnected files.",
   },
 ];
 
@@ -283,132 +332,156 @@ function ClientJourney() {
 const behindOperationsSlides: CarouselSlide[] = [
   {
     src: "/case-study/behind-operations/NogalSolutions-BW1-Auto-Ack-Email-New-Intake-Submission.png",
-    title: "BW1 — Auto-Ack Email",
+    title: "BW1: Auto-Ack Email",
     caption: "Sends the instant confirmation email the moment a form is submitted.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW2-Qualification-Engine.png",
-    title: "BW2 — Qualification Engine",
-    caption: "Scores the request and branches qualified vs. not — automatically.",
+    title: "BW2: Qualification Engine",
+    caption: "Scores the request and automatically branches qualified vs. not.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW3-Qualified-Handoff.png",
-    title: "BW3 — Qualified Handoff",
-    caption: "Creates the CRM contact, company, and deal; sends the booking email; kicks off the recording-folder setup.",
+    title: "BW3: Qualified Handoff",
+    caption:
+      "Creates the CRM contact, company, and deal; sends the booking email; kicks off the recording-folder setup.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW4-Not-Qualified-Decline.png",
-    title: "BW4 — Not-Qualified Decline",
-    caption: "Sends a respectful decline for requests that don't qualify — no dead leads left untouched.",
+    title: "BW4: Not-Qualified Decline",
+    caption:
+      "Sends a respectful decline for requests that don't qualify, so no dead leads are left untouched.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW5-Recording-Watcher-Transcription.png",
-    title: "BW5 — Recording Watcher & Transcription",
+    title: "BW5: Recording Watcher & Transcription",
     caption: "Detects the uploaded discovery-call recording and transcribes it automatically.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW6-Post-Call-Analysis-Prompt-A.png",
-    title: "BW6 — Post-Call Analysis",
-    caption: "Drafts a structured analysis from the transcript — held for a human review gate before anything moves forward.",
+    title: "BW6: Post-Call Analysis",
+    caption:
+      "Drafts a structured analysis from the transcript, then holds it for a human review gate before anything moves forward.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW7-Sequenced-Generation-Prompts-B1-B7-Modular.png",
-    title: "BW7 — Sequenced Generation",
-    caption: "Once the analysis is approved, sequences the generation of all 7 client deliverables.",
+    title: "BW7: Sequenced Generation",
+    caption:
+      "Once the analysis is approved, sequences the generation of all 7 client deliverables.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW7-Sub-workflow-Generate-One-Deliverable.png",
-    title: "BW7 Sub-workflow — Generate One Deliverable",
-    caption: "The reusable generator BW7 calls once per deliverable — 7 runs per engagement.",
+    title: "BW7 Sub-workflow: Generate One Deliverable",
+    caption:
+      "The reusable generator BW7 calls once per deliverable, so 7 runs happen per engagement.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW8-Revision-Wrapper.png",
-    title: "BW8 — Revision Wrapper",
+    title: "BW8: Revision Wrapper",
     caption: "Handles requested edits without restarting the whole pipeline.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW9-Auto-Present-on-Approval.png",
-    title: "BW9 — Auto-Present on Approval",
-    caption: "Renders the approved deliverables into one branded package the moment everything's signed off.",
+    title: "BW9: Auto-Present on Approval",
+    caption:
+      "Renders the approved deliverables into one branded package the moment everything's signed off.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-BW10-Send-and-Close.png",
-    title: "BW10 — Send & Close",
+    title: "BW10: Send & Close",
     caption: "Emails the client and updates the CRM deal stage automatically.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Shared-Provision-Discovery-Recording-Dropzone.png",
-    title: "Shared — Provision Discovery Recording Dropzone",
-    caption: "Creates the exact upload folder for the discovery-call recording — no human-typed paths, no mismatched IDs.",
+    title: "Shared: Provision Discovery Recording Dropzone",
+    caption:
+      "Creates the exact upload folder for the discovery-call recording, with no human-typed paths and no mismatched IDs.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Shared-Advance-Deal-Stage.png",
-    title: "Shared — Advance Deal Stage",
+    title: "Shared: Advance Deal Stage",
     caption: "Keeps the CRM's deal stage in sync with real pipeline progress at every checkpoint.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Shared-Render-Deliverables-PDF.png",
-    title: "Shared — Render Deliverables PDF",
+    title: "Shared: Render Deliverables PDF",
     caption: "The shared renderer both Auto-Present and revisions call to produce the branded PDF.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Sub-Workflow-Resolve-Prospect-with-Update-Status.png",
-    title: "Shared — Resolve Prospect + Update Status",
-    caption: "A shared lookup used across the pipeline to resolve a prospect's record and current status.",
+    title: "Shared: Resolve Prospect + Update Status",
+    caption:
+      "A shared lookup used across the pipeline to resolve a prospect's record and current status.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Infra-Daily-Supabase-Backup-to-R2.png",
-    title: "Infra — Daily Supabase Backup",
-    caption: "Backs up the database daily to offsite storage, on its own schedule, independent of any client engagement.",
+    title: "Infra: Daily Supabase Backup",
+    caption:
+      "Backs up the database daily to offsite storage, on its own schedule, independent of any client engagement.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Infra-Backup-Retention-Purge-R2.png",
-    title: "Infra — Backup Retention Purge",
+    title: "Infra: Backup Retention Purge",
     caption: "Cleans up old backups on a retention schedule so storage doesn't grow unbounded.",
   },
   {
     src: "/case-study/behind-operations/NogalSolutions-Keep-Alive-Supabase-Ping.png",
-    title: "Infra — Keep-Alive Ping",
+    title: "Infra: Keep-Alive Ping",
     caption: "A small scheduled ping that keeps the database connection warm.",
   },
   {
     src: "/case-study/CRM-Deals.png",
-    title: "HubSpot — Deals Pipeline",
-    caption: "The board view of every engagement's pipeline stage, synced automatically by the workflows above.",
+    title: "HubSpot: Deals Pipeline",
+    caption:
+      "The board view of every engagement's pipeline stage, synced automatically by the workflows above.",
   },
   {
     src: "/case-study/CRM-Contacts.png",
-    title: "HubSpot — Contacts",
-    caption: "Every prospect gets a Contact record automatically — no manual data entry from the intake form.",
+    title: "HubSpot: Contacts",
+    caption:
+      "Every prospect gets a Contact record automatically, with no manual data entry from the intake form.",
   },
   {
     src: "/case-study/CRM-Client-Requirements.png",
-    title: "HubSpot — Client Requirements",
-    caption: "The AI-generated post-call analysis, saved as its own record and linked to the Contact for Gate #1 review.",
+    title: "HubSpot: Client Requirements",
+    caption:
+      "The AI-generated post-call analysis, saved as its own record and linked to the Contact for Gate #1 review.",
   },
   {
     src: "/case-study/CRM-Deliverables.png",
-    title: "HubSpot — Deliverables",
-    caption: "All 7 generated documents, saved as individual records and linked back to the Contact.",
+    title: "HubSpot: Deliverables",
+    caption:
+      "All 7 generated documents, saved as individual records and linked back to the Contact.",
   },
   {
     src: "/case-study/Supabase-DB-Schema.png",
-    title: "Supabase — Database Schema",
-    caption: "The relational schema underneath the whole pipeline — prospects, sessions, analyses, and deliverables, all foreign-keyed together.",
+    title: "Supabase: Database Schema",
+    caption:
+      "The relational schema underneath the whole pipeline: prospects, sessions, analyses, and deliverables, all foreign-keyed together.",
   },
   {
     src: "/case-study/Slack-Pipeline-Activity.png",
-    title: "Slack — Pipeline Activity",
+    title: "Slack: Pipeline Activity",
     caption: "A live feed of every successful step across the pipeline, posted in real time.",
   },
   {
     src: "/case-study/Slack-Error-Alert.png",
-    title: "Slack — Error Alert",
-    caption: "When something fails, the exact failure and next step get posted here immediately — not silently swallowed.",
+    title: "Slack: Error Alert",
+    caption:
+      "When something fails, the exact failure and next step get posted here immediately, instead of being silently swallowed.",
   },
 ];
 
-const techStack = ["n8n", "Supabase (Postgres + Storage)", "HubSpot CRM", "Claude via OpenRouter", "Whisper transcription", "Resend", "Slack", "Cloudflare Pages"];
+const techStack = [
+  "n8n",
+  "Supabase (Postgres + Storage)",
+  "HubSpot CRM",
+  "Claude via OpenRouter",
+  "Whisper transcription",
+  "Resend",
+  "Slack",
+  "Cloudflare Pages",
+];
 
 function BehindTheOperations() {
   return (
@@ -418,35 +491,104 @@ function BehindTheOperations() {
       <div className="mt-10 rounded-xl border border-border/60 bg-card/40 p-6">
         <h4 className="text-base font-semibold tracking-tight">Why this many workflows?</h4>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Each stage runs as its own dedicated workflow on purpose — small, single-responsibility pieces are easier to build, test, and review individually. Every workflow here went through a manual, node-by-node review before going live, and carries its own execution log and Slack alerting, so a failure anywhere is caught and traceable immediately — not buried inside one giant, unreadable pipeline.
+          Each stage runs as its own dedicated workflow on purpose, since small,
+          single-responsibility pieces are easier to build, test, and review individually. Every
+          workflow here went through a manual, node-by-node review before going live, and carries
+          its own execution log and Slack alerting, so a failure anywhere is caught and traceable
+          immediately instead of buried inside one giant, unreadable pipeline.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          That's a deliberate tradeoff for reliability and safe iteration while proving the system out — not the smallest possible footprint. For a leaner deployment, several of these could reasonably be consolidated: folding the shared sub-workflows into their callers, or combining the infrastructure jobs into one scheduled workflow. That's an option on the table for your build, not a constraint of the approach.
-        </p>
-      </div>
-
-      <div className="mt-6 rounded-xl border border-border/60 bg-card/40 p-6">
-        <h4 className="text-base font-semibold tracking-tight">Why does the CRM look incomplete?</h4>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Fields like phone number, lead status, last contacted, lead type, priority, and the dollar amount on each Deal sit empty in these screenshots — that's real, not a rendering glitch. The pipeline only writes the fields it actually has data for: what the intake form captures and what the AI-generated analysis produces. Enrichment data like these doesn't have a source wired up yet, so it's filled in by hand when it matters.
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Automating that — deal-value estimation, lead scoring, contact enrichment — is a real, scoped future improvement, not something this build overlooked. For now, it's a deliberate manual step, same as the discovery call itself.
+          That's a deliberate tradeoff for reliability and safe iteration while proving the system
+          out, not the smallest possible footprint. For a leaner deployment, several of these could
+          reasonably be consolidated: folding the shared sub-workflows into their callers, or
+          combining the infrastructure jobs into one scheduled workflow. That's an option on the
+          table for your build, not a constraint of the approach.
         </p>
       </div>
 
       <div className="mt-8 flex flex-wrap gap-2">
         {techStack.map((t) => (
-          <span key={t} className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80">
+          <span
+            key={t}
+            className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80"
+          >
             {t}
           </span>
         ))}
       </div>
 
       <p className="mt-8 rounded-xl border border-primary/20 bg-primary/[0.05] p-4 text-sm leading-relaxed text-muted-foreground">
-        <strong className="text-foreground">Verification, not vibes:</strong> every one of these workflows was proven against a real, live execution — not just a passing validation check — before I called it done.
+        <strong className="text-foreground">Verification, not vibes:</strong> every one of these
+        workflows was proven against a real, live execution, not just a passing validation check,
+        before I called it done.
       </p>
     </div>
+  );
+}
+
+/* ──────────────── PAYMENT & ONBOARDING/KICKOFF SYSTEM ──────────────── */
+
+const paymentOnboardingSlides: CarouselSlide[] = [
+  {
+    src: "/case-study/slack-request-deposit-message.png",
+    title: "Deposit requested",
+    caption:
+      "The system computes 50% of the Deal total and Slacks me the exact figure to request from the client.",
+  },
+  {
+    src: "/case-study/received-onboarding-email.png",
+    title: "Onboarding kit delivered",
+    caption:
+      "Once the deposit's confirmed, the client automatically gets their signed contract and payment receipt.",
+  },
+  {
+    src: "/case-study/behind-operations/hubspot-deal-closed-won.png",
+    title: "Deal closes for real",
+    caption: "The CRM Deal genuinely advances to closed-won, not a manual drag-and-drop.",
+  },
+  {
+    src: "/case-study/behind-operations/kickoff-agenda-slack-post.png",
+    title: "Kickoff agenda drafted",
+    caption: "An AI-drafted agenda lands in Slack, built from the seven approved deliverables.",
+  },
+  {
+    src: "/case-study/behind-operations/NogalSolutions Notify Expected Deposit.png",
+    title: "Notify Expected Deposit",
+    caption:
+      "Computes and Slacks the 50% deposit figure the moment a Deal moves to awaiting deposit.",
+  },
+  {
+    src: "/case-study/behind-operations/NogalSolutions Record Deposit Payment.png",
+    title: "Record Deposit Payment",
+    caption:
+      "Matches the received amount against what's expected, and a mismatch routes to manual review instead of a guess.",
+  },
+  {
+    src: "/case-study/behind-operations/NogalSolutions Send Onboarding Kit.png",
+    title: "Send Onboarding Kit",
+    caption: "Emails the welcome message, signed contract, and receipt as direct attachments.",
+  },
+  {
+    src: "/case-study/behind-operations/NogalSolutions Kickoff Prep.png",
+    title: "Kickoff Prep",
+    caption: "Drafts the kickoff-call agenda from the seven approved deliverables.",
+  },
+];
+
+function PaymentOnboardingKickoff() {
+  return (
+    <Section
+      id="payment-onboarding-kickoff"
+      title={
+        <>
+          Payment, Onboarding, & <span className="text-gradient-crimson">Kickoff System.</span>
+        </>
+      }
+      subtitle="Once a client agrees, the system requests and verifies the deposit, delivers the signed contract and receipt, and drafts the kickoff-call agenda, automatically."
+      align="center"
+    >
+      <Carousel slides={paymentOnboardingSlides} />
+    </Section>
   );
 }
 
@@ -459,7 +601,8 @@ function ClosingCTA() {
         <div
           className="relative overflow-hidden rounded-3xl border border-primary/20 p-10 shadow-elegant md:p-16 lg:p-20"
           style={{
-            background: "linear-gradient(135deg, #0B0608 0%, #2A0710 45%, #45101C 65%, #2A0710 85%, #0B0608 100%)",
+            background:
+              "linear-gradient(135deg, #0B0608 0%, #2A0710 45%, #45101C 65%, #2A0710 85%, #0B0608 100%)",
           }}
         >
           <div
@@ -470,21 +613,24 @@ function ClosingCTA() {
                 "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
               backgroundSize: "44px 44px",
               maskImage: "radial-gradient(ellipse 80% 70% at 30% 40%, black 30%, transparent 85%)",
-              WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 30% 40%, black 30%, transparent 85%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 80% 70% at 30% 40%, black 30%, transparent 85%)",
             }}
           />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
             style={{
-              background: "radial-gradient(ellipse 55% 60% at 22% 32%, oklch(0.45 0.16 18 / 0.45), transparent 65%)",
+              background:
+                "radial-gradient(ellipse 55% 60% at 22% 32%, oklch(0.45 0.16 18 / 0.45), transparent 65%)",
             }}
           />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
             style={{
-              background: "radial-gradient(ellipse 100% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+              background:
+                "radial-gradient(ellipse 100% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
             }}
           />
           <div className="relative max-w-3xl">
@@ -492,7 +638,8 @@ function ClosingCTA() {
               Want a system like this built for your business?
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary-foreground/85 md:text-xl">
-              This isn't a mockup. It's the same engineering discipline I'll bring to your operations — architected, built, and proven before it ever touches a real client.
+              This isn't a mockup. It's the same engineering discipline I'll bring to your
+              operations: architected, built, and proven before it ever touches a real client.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
@@ -501,6 +648,14 @@ function ClosingCTA() {
               >
                 Start a Project
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href="/resources/aaron-nogal-ai-automation-specialist-resume.pdf"
+                download="Aaron-Nogal-AI-Automation-Specialist-Resume.pdf"
+                className="group inline-flex items-center gap-2 rounded-xl border border-white/35 bg-white/10 px-6 py-3.5 text-base font-medium text-white shadow-card backdrop-blur-sm transition-all hover:translate-y-[-1px] hover:border-white/60 hover:bg-white/20"
+              >
+                Download My Resume
+                <Download className="size-4 transition-transform group-hover:translate-y-0.5" />
               </a>
             </div>
           </div>
