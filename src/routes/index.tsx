@@ -1188,10 +1188,6 @@ function WhyChoose() {
 function ProofOfWork() {
   const soon = [
     {
-      title: "Finance & Invoice Processing",
-      body: "Automated invoicing, payment tracking, and reconciliation, billing that runs itself instead of chasing spreadsheets.",
-    },
-    {
       title: "Custom Automation for Your Business",
       body: "A tailored system built around your specific operations, for whatever doesn't fit a template yet.",
     },
@@ -1199,7 +1195,7 @@ function ProofOfWork() {
   const stats = [
     { v: "18", l: "automated workflows" },
     { v: "< 10 min", l: "to generate all 7 deliverables" },
-    { v: "3–5 days", l: "of manual work eliminated" },
+    { v: "3 - 5 days", l: "of manual work eliminated" },
     { v: "2", l: "human review gates" },
   ];
   const { ref, inView } = useInView<HTMLDivElement>();
@@ -1267,7 +1263,9 @@ function ProofOfWork() {
             <div className="mt-9 grid grid-cols-2 gap-6 border-t border-border/60 pt-7 sm:grid-cols-4">
               {stats.map((s) => (
                 <div key={s.l}>
-                  <div className="text-xl font-semibold tracking-tight md:text-2xl">{s.v}</div>
+                  <div className="whitespace-nowrap text-xl font-semibold tracking-tight md:text-2xl">
+                    {s.v}
+                  </div>
                   <div className="mt-1 text-xs text-muted-foreground">{s.l}</div>
                 </div>
               ))}
@@ -1280,8 +1278,33 @@ function ProofOfWork() {
           </div>
         </Link>
 
-        {/* Not built yet — small stubs, not full cards competing with the real thing */}
         <div className="flex flex-col gap-4">
+          {/* Second real, live system, connected to the CEP but its own process */}
+          <a
+            href="/consultant-engagement-pipeline#payment-onboarding-kickoff"
+            className="group relative overflow-hidden rounded-2xl border border-primary/25 bg-card/60 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/45"
+          >
+            <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium tracking-wider text-primary uppercase">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+              </span>
+              Live System
+            </div>
+            <h4 className="mt-2.5 text-base font-semibold tracking-tight">
+              Payment & Onboarding System
+            </h4>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Verifies the deposit against the expected amount, then sends the signed contract,
+              receipt, and kickoff agenda automatically.
+            </p>
+            <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
+              See how it works
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </a>
+
+          {/* Not built yet — small stubs, not full cards competing with the real thing */}
           {soon.map((p) => (
             <div key={p.title} className="rounded-2xl border border-border/60 bg-card/50 p-6">
               <div className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase">

@@ -6,6 +6,14 @@ import { Section } from "@/components/site/Section";
 import { Container } from "@/components/site/Container";
 import { SiteBackground } from "@/components/site/SiteBackground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -18,6 +26,7 @@ import {
   Phone,
   Layers,
   Rocket,
+  Waypoints,
 } from "lucide-react";
 
 export const Route = createFileRoute("/consultant-engagement-pipeline")({
@@ -62,7 +71,7 @@ function ConsultantEngagementPipeline() {
 const heroStats = [
   { v: "18", l: "automated workflows" },
   { v: "< 10 min", l: "to generate all 7 deliverables" },
-  { v: "3–5 days", l: "of manual work eliminated" },
+  { v: "3 - 5 days", l: "of manual work eliminated" },
   { v: "2", l: "human review gates, by design" },
 ];
 
@@ -125,7 +134,9 @@ function CaseStudyHero() {
             <div className="mt-14 grid grid-cols-2 gap-6 border-t border-border/60 pt-8 sm:grid-cols-4">
               {heroStats.map((s) => (
                 <div key={s.l}>
-                  <div className="text-2xl font-semibold tracking-tight md:text-3xl">{s.v}</div>
+                  <div className="whitespace-nowrap text-xl font-semibold tracking-tight md:text-2xl">
+                    {s.v}
+                  </div>
                   <div className="mt-1 text-xs text-muted-foreground md:text-sm">{s.l}</div>
                 </div>
               ))}
@@ -476,17 +487,517 @@ const techStack = [
   "n8n",
   "Supabase (Postgres + Storage)",
   "HubSpot CRM",
-  "Claude via OpenRouter",
+  "OpenRouter",
   "Whisper transcription",
   "Resend",
   "Slack",
   "Cloudflare Pages",
+  "Claude",
+  "Codex",
 ];
+
+/* ───────────────── FULL PROCESS MAP (FLOWCHART) ───────────────── */
+
+function FlowArrow({ height = 24 }: { height?: number }) {
+  return (
+    <svg
+      width="16"
+      height={height}
+      viewBox={`0 0 16 ${height}`}
+      className="mx-auto block text-border"
+      aria-hidden
+    >
+      <line
+        x1="8"
+        y1="0"
+        x2="8"
+        y2={height}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        markerEnd="url(#pm-arrow)"
+      />
+    </svg>
+  );
+}
+
+function FlowNode({
+  title,
+  desc,
+  tag,
+  variant = "auto",
+  human = false,
+}: {
+  title: string;
+  desc: string;
+  tag?: string;
+  variant?: "auto" | "human" | "exit" | "alt";
+  human?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "mx-auto w-full max-w-md rounded-xl border p-4",
+        variant === "auto" && "border-border/70 bg-card/60",
+        variant === "human" && "border-primary/35 bg-primary/[0.08]",
+        variant === "exit" && "border-dashed border-border/60 bg-transparent",
+        variant === "alt" && "border-dashed border-border/70 bg-card/40",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p
+          className={cn(
+            "text-sm font-semibold",
+            variant === "exit" && "font-medium text-muted-foreground",
+          )}
+        >
+          {title}
+        </p>
+        {human && (
+          <span className="shrink-0 rounded-md border border-primary/35 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+            Human
+          </span>
+        )}
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{desc}</p>
+      {tag && <p className="mt-1 font-mono text-[10px] text-muted-foreground/60">{tag}</p>}
+    </div>
+  );
+}
+
+function ProcessMapFlowchart() {
+  return (
+    <div className="mx-auto max-w-2xl">
+      <svg width="0" height="0" className="absolute" aria-hidden>
+        <defs>
+          <marker
+            id="pm-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+          >
+            <path
+              d="M2 1L8 5L2 9"
+              fill="none"
+              stroke="currentColor"
+              className="text-border"
+              strokeWidth="1.5"
+            />
+          </marker>
+        </defs>
+      </svg>
+
+      <div className="mb-8 grid grid-cols-2 gap-1 overflow-hidden rounded-xl border border-border/60 sm:grid-cols-4">
+        {[
+          { v: "18", l: "automated workflows" },
+          { v: "<10 min", l: "to draft all 7 deliverables" },
+          { v: "5", l: "human decision points" },
+          { v: "2", l: "formal HubSpot review gates" },
+        ].map((s) => (
+          <div key={s.l} className="bg-card/60 p-3 text-center">
+            <div className="text-base font-semibold tabular-nums">{s.v}</div>
+            <div className="mt-0.5 text-[10px] leading-tight text-muted-foreground">{s.l}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mb-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-b border-border/60 pb-6 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-sm border border-primary/40 bg-primary/[0.1]" />
+          human decides
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rotate-45 rounded-[2px] border border-[oklch(0.45_0.14_198_/_0.55)] bg-[oklch(0.45_0.14_198_/_0.16)]" />
+          branch point
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-sm border border-border/70 bg-card" />
+          automated step
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-sm border border-dashed border-border/70" />
+          branch exit or end
+        </span>
+      </div>
+
+      <div className="flex flex-col items-center">
+        <FlowNode
+          title="Website intake form"
+          desc="A stranger finds the site and submits a short form. Public, no account needed."
+        />
+        <FlowArrow />
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 1, intake and qualification
+        </p>
+        <FlowNode
+          title="Auto-ack email"
+          desc="An instant confirmation lands immediately, not a promise that someone will reach out in 48 hours."
+          tag="BW1, Auto-Ack Email"
+        />
+        <FlowArrow />
+        <FlowNode
+          title="Qualification engine"
+          desc="Scores the request against 7 fixed rules. No human triage on the first pass."
+          tag="BW2, Qualification Engine"
+        />
+        <svg
+          width="16"
+          height="18"
+          viewBox="0 0 16 18"
+          className="mx-auto block text-border"
+          aria-hidden
+        >
+          <line x1="8" y1="0" x2="8" y2="18" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+
+        <svg width="260" height="86" viewBox="0 0 260 86" role="img" className="mx-auto block">
+          <title>Qualified?</title>
+          <polygon
+            points="130,4 220,43 130,82 40,43"
+            fill="oklch(0.45 0.14 198 / 0.16)"
+            stroke="oklch(0.45 0.14 198 / 0.55)"
+            strokeWidth="1"
+          />
+          <text
+            x="130"
+            y="43"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize="13"
+            fontWeight="600"
+            fill="oklch(0.78 0.09 198)"
+          >
+            Qualified?
+          </text>
+          <line
+            x1="40"
+            y1="43"
+            x2="4"
+            y2="66"
+            className="text-border"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <line
+            x1="220"
+            y1="43"
+            x2="256"
+            y2="66"
+            className="text-border"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+        </svg>
+
+        <div className="grid w-full max-w-md grid-cols-2 gap-4 sm:max-w-lg">
+          <div>
+            <p className="mb-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+              No
+            </p>
+            <FlowNode
+              variant="exit"
+              title="Not-qualified decline"
+              desc="A respectful decline email, not silence."
+              tag="BW4, end of pipeline"
+            />
+          </div>
+          <div>
+            <p className="mb-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-[oklch(0.78_0.09_198)]">
+              Yes
+            </p>
+            <FlowNode
+              title="Qualified handoff"
+              desc="Creates the HubSpot Contact, Company, and Deal, sends the booking email, and provisions the recording dropzone. If sourced inbound, also drafts a pre-call brief to Slack."
+              tag="BW3, Qualified Handoff"
+            />
+          </div>
+        </div>
+
+        <svg
+          width="100%"
+          style={{ maxWidth: 400 }}
+          viewBox="0 0 400 34"
+          className="block text-border"
+        >
+          <path
+            d="M300 0 L300 15 L200 15 L200 34"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            markerEnd="url(#pm-arrow)"
+          />
+        </svg>
+        <p className="mb-4 text-center text-xs text-muted-foreground/80">
+          Prospect is now ready for discovery. Also joined here by:
+        </p>
+
+        <FlowNode
+          variant="alt"
+          title="Outbound bootstrap"
+          desc="A separate entry, bypassing all of phase 1 above. Aaron sources the prospect directly (referral, cold outreach) and submits his own private form. Qualification is skipped entirely, since he already decided to pursue them. Reaches this exact same point: identity created, dropzone provisioned."
+          tag="Outbound Discovery Bootstrap"
+        />
+        <FlowArrow />
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 2, discovery
+        </p>
+        <FlowNode
+          human
+          variant="human"
+          title="Discovery call"
+          desc="The one deliberately human step in the entire pipeline. A real conversation, recorded."
+        />
+        <FlowArrow />
+        <FlowNode
+          title="Recording and transcription"
+          desc="Detects the uploaded recording and transcribes it automatically (Whisper)."
+          tag="BW5, Recording Watcher / Transcription"
+        />
+        <FlowArrow />
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 3, gate #1, analysis
+        </p>
+        <FlowNode
+          title="Post-call analysis"
+          desc="Drafts a structured analysis from the transcript and holds it for review."
+          tag="BW6, Post-Call Analysis, Prompt A"
+        />
+        <FlowArrow />
+        <FlowNode
+          human
+          variant="human"
+          title="Gate #1 review"
+          desc="Aaron reviews the AI's analysis in HubSpot and approves it before anything generates."
+        />
+        <FlowArrow />
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 4, gate #2, generation
+        </p>
+        <FlowNode
+          title="Sequenced generation"
+          desc="Drafts all 7 client deliverables in sequence: architecture, spec, roadmap, SOP, proposal, pricing, and terms."
+          tag="BW7, Sequenced Generation, Prompts B1 to B7"
+        />
+        <FlowArrow />
+        <FlowNode
+          human
+          variant="human"
+          title="Gate #2 review"
+          desc="Aaron reviews each of the 7 deliverables. Approves, edits, or requests a revision."
+        />
+        <p className="mt-2 text-center text-[11px] text-muted-foreground/70">
+          revision requested regenerates just that section, then back to this review (BW8)
+        </p>
+        <FlowArrow />
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 5, present and send
+        </p>
+        <FlowNode
+          title="Auto-present on approval"
+          desc="The instant all 7 are approved, renders one combined branded PDF, whether it's the first pass or any later re-presentation."
+          tag="BW9, Auto-Present on Approval"
+        />
+        <FlowArrow />
+        <FlowNode
+          title="Send and close"
+          desc="Emails the client the PDF and advances the Deal to sent, then negotiating."
+          tag="BW10, Send & Close"
+        />
+        <FlowArrow />
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 6, deposit and close
+        </p>
+        <FlowNode
+          title="Notify expected deposit"
+          desc="Once the Deal enters awaiting deposit, computes 50% of the total and Slacks Aaron the exact figure to request."
+        />
+        <FlowArrow />
+        <FlowNode
+          human
+          variant="human"
+          title="Record deposit payment"
+          desc="Aaron requests the deposit himself (any payment rail), then enters the amount received and confirms it in HubSpot."
+        />
+        <svg
+          width="16"
+          height="18"
+          viewBox="0 0 16 18"
+          className="mx-auto block text-border"
+          aria-hidden
+        >
+          <line x1="8" y1="0" x2="8" y2="18" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+
+        <svg width="280" height="86" viewBox="0 0 280 86" role="img" className="mx-auto block">
+          <title>Deposit matches?</title>
+          <polygon
+            points="140,4 230,43 140,82 50,43"
+            fill="oklch(0.45 0.14 198 / 0.16)"
+            stroke="oklch(0.45 0.14 198 / 0.55)"
+            strokeWidth="1"
+          />
+          <text
+            x="140"
+            y="43"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize="13"
+            fontWeight="600"
+            fill="oklch(0.78 0.09 198)"
+          >
+            Deposit matches?
+          </text>
+          <line
+            x1="50"
+            y1="43"
+            x2="4"
+            y2="66"
+            className="text-border"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <line
+            x1="230"
+            y1="43"
+            x2="276"
+            y2="66"
+            className="text-border"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+        </svg>
+
+        <div className="grid w-full max-w-md grid-cols-2 gap-4 sm:max-w-lg">
+          <div>
+            <p className="mb-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-[oklch(0.78_0.09_198)]">
+              Yes
+            </p>
+            <FlowNode
+              title="Closed-won, onboarding kit"
+              desc="Advances the Deal to closed-won and emails the welcome message, signed contract, and payment receipt."
+            />
+          </div>
+          <div>
+            <p className="mb-1.5 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+              No
+            </p>
+            <FlowNode
+              variant="exit"
+              title="Review task and Slack alert"
+              desc="Creates a HubSpot Task on the Contact instead of guessing."
+            />
+            <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground/70">
+              back to Record Deposit Payment once corrected
+            </p>
+          </div>
+        </div>
+
+        <svg
+          width="100%"
+          style={{ maxWidth: 400 }}
+          viewBox="0 0 400 34"
+          className="block text-border"
+        >
+          <path
+            d="M100 0 L100 15 L200 15 L200 34"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            markerEnd="url(#pm-arrow)"
+          />
+        </svg>
+        <p className="mb-4 text-center text-xs text-muted-foreground/80">
+          Matched deposit continues.
+        </p>
+
+        <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          Phase 7, kickoff
+        </p>
+        <FlowNode
+          title="Kickoff prep"
+          desc="Drafts a kickoff-call agenda from the 7 approved deliverables and posts it to Slack for Aaron to personalize."
+        />
+        <FlowArrow />
+        <FlowNode
+          human
+          variant="human"
+          title="Kickoff call"
+          desc="The engagement's real first working session, a genuine conversation, not automated."
+        />
+        <FlowArrow />
+        <FlowNode variant="exit" title="Engagement live" desc="" />
+      </div>
+
+      <div className="mx-auto mt-12 max-w-md border-t border-border/60 pt-6">
+        <h5 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Reused throughout, not drawn as separate steps
+        </h5>
+        <ul className="mt-3 list-disc space-y-1.5 pl-4 text-xs leading-relaxed text-muted-foreground">
+          <li>Resolve Prospect + Update Status, a shared lookup called across most stages</li>
+          <li>
+            Advance Deal Stage, keeps the HubSpot Deal's pipeline stage in sync at every checkpoint
+          </li>
+          <li>
+            Render Deliverables PDF, the shared renderer behind first presentation and
+            re-presentation
+          </li>
+          <li>
+            Provision Discovery Recording Dropzone, creates the exact upload folder, no human-typed
+            paths
+          </li>
+        </ul>
+        <p className="mt-3 text-[11px] text-muted-foreground/70">
+          3 infrastructure workflows run independently of any engagement: a daily Supabase backup, a
+          backup-retention purge, and a keep-alive ping.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function BehindTheOperations() {
   return (
     <div className="mx-auto max-w-4xl">
       <Carousel slides={behindOperationsSlides} />
+
+      <div className="mt-10 flex justify-center">
+        <Dialog>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              className="group inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card/60 px-5 py-3 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-card"
+            >
+              <Waypoints className="size-4 text-primary" />
+              View the full process map
+              <ArrowRight className="size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </DialogTrigger>
+          <DialogContent className="flex max-h-[85vh] w-[95vw] max-w-3xl flex-col gap-0 p-0 sm:rounded-2xl">
+            <DialogHeader className="shrink-0 border-b border-border/60 px-6 py-5 text-center sm:text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                Full process map
+              </p>
+              <DialogTitle className="mt-1 text-xl tracking-tight md:text-2xl">
+                Every stage, every branch, every human decision point
+              </DialogTitle>
+              <DialogDescription className="mx-auto max-w-md">
+                From a stranger filling out a form to a closed, onboarded client, drawn as an actual
+                flowchart, not a slideshow.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
+              <ProcessMapFlowchart />
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <div className="mt-10 rounded-xl border border-border/60 bg-card/40 p-6">
         <h4 className="text-base font-semibold tracking-tight">Why this many workflows?</h4>
@@ -552,24 +1063,24 @@ const paymentOnboardingSlides: CarouselSlide[] = [
     caption: "An AI-drafted agenda lands in Slack, built from the seven approved deliverables.",
   },
   {
-    src: "/case-study/behind-operations/NogalSolutions Notify Expected Deposit.png",
+    src: "/case-study/behind-operations/NogalSolutions-Notify-Expected-Deposit.png",
     title: "Notify Expected Deposit",
     caption:
       "Computes and Slacks the 50% deposit figure the moment a Deal moves to awaiting deposit.",
   },
   {
-    src: "/case-study/behind-operations/NogalSolutions Record Deposit Payment.png",
+    src: "/case-study/behind-operations/NogalSolutions-Record-Deposit-Payment.png",
     title: "Record Deposit Payment",
     caption:
       "Matches the received amount against what's expected, and a mismatch routes to manual review instead of a guess.",
   },
   {
-    src: "/case-study/behind-operations/NogalSolutions Send Onboarding Kit.png",
+    src: "/case-study/behind-operations/NogalSolutions-Send-Onboarding-Kit.png",
     title: "Send Onboarding Kit",
     caption: "Emails the welcome message, signed contract, and receipt as direct attachments.",
   },
   {
-    src: "/case-study/behind-operations/NogalSolutions Kickoff Prep.png",
+    src: "/case-study/behind-operations/NogalSolutions-Kickoff-Prep.png",
     title: "Kickoff Prep",
     caption: "Drafts the kickoff-call agenda from the seven approved deliverables.",
   },
