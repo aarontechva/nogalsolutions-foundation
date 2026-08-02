@@ -5,7 +5,6 @@ import { Footer } from "@/components/site/Footer";
 import { Section } from "@/components/site/Section";
 import { Container } from "@/components/site/Container";
 import { SiteBackground } from "@/components/site/SiteBackground";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +13,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
+  Waypoints,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -26,7 +27,6 @@ import {
   Phone,
   Layers,
   Rocket,
-  Waypoints,
 } from "lucide-react";
 
 export const Route = createFileRoute("/consultant-engagement-pipeline")({
@@ -60,6 +60,8 @@ function ConsultantEngagementPipeline() {
       <CaseStudyHero />
       <HowItWorks />
       <PaymentOnboardingKickoff />
+      <OperationsProof />
+      <TechStackSection />
       <ClosingCTA />
       <Footer />
     </div>
@@ -198,6 +200,9 @@ function HowItWorks() {
       subtitle="One simple experience for the client. A fully engineered pipeline underneath it."
       align="center"
     >
+      <div className="mb-8 flex justify-center">
+        <ProcessMapDialog />
+      </div>
       <Tabs defaultValue="client" className="w-full">
         <div className="flex justify-center">
           <TabsList className="flex h-auto w-fit flex-wrap justify-center gap-1 rounded-xl border border-border/80 bg-card/60 p-1.5">
@@ -484,17 +489,73 @@ const behindOperationsSlides: CarouselSlide[] = [
 ];
 
 const techStack = [
-  "n8n",
-  "Supabase (Postgres + Storage)",
-  "HubSpot CRM",
-  "OpenRouter",
-  "Whisper transcription",
-  "Resend",
-  "Slack",
-  "Cloudflare Pages",
-  "Claude",
-  "Codex",
+  {
+    name: "n8n",
+    role: "Orchestration",
+    detail:
+      "Self-hosted on a private VPS. Every stage runs as its own workflow, with its own execution log and alerting.",
+  },
+  {
+    name: "Supabase",
+    role: "Data and files",
+    detail:
+      "Postgres for prospects, deliverables, and versioned revisions, plus Storage for call recordings and rendered PDFs.",
+  },
+  {
+    name: "HubSpot CRM",
+    role: "Client record and review gates",
+    detail:
+      "Holds the Contact, Deal, and custom deliverable records. Both human review gates are real Tasks here, not a bespoke UI.",
+  },
+  {
+    name: "OpenRouter",
+    role: "Model gateway",
+    detail:
+      "One integration point in front of every model, so a model can be swapped without touching the build.",
+  },
+  {
+    name: "Claude",
+    role: "Analysis and generation",
+    detail:
+      "Reads the discovery transcript and drafts all seven client deliverables, each into a strict output schema.",
+  },
+  {
+    name: "Whisper",
+    role: "Call transcription",
+    detail:
+      "Turns the raw discovery recording into the transcript everything downstream reasons over.",
+  },
+  {
+    name: "Resend",
+    role: "Client email",
+    detail:
+      "Sends every client-facing message: the acknowledgement, the booking link, the proposal, and the onboarding kit.",
+  },
+  {
+    name: "Slack",
+    role: "Operator visibility",
+    detail:
+      "Pipeline activity and failure alerts both land here, so the whole system can be monitored from one channel.",
+  },
+  {
+    name: "Gotenberg",
+    role: "PDF rendering",
+    detail:
+      "A self-hosted converter that turns the branded HTML proposal into the combined PDF the client receives.",
+  },
+  {
+    name: "Cloudflare Pages",
+    role: "Site and intake",
+    detail: "Hosts this site and the intake form that starts the whole pipeline.",
+  },
+  {
+    name: "Codex",
+    role: "Build assistance",
+    detail:
+      "Used alongside Claude to build and review the system itself. Not part of the runtime, unlike everything above it.",
+  },
 ];
+
 
 /* ───────────────── FULL PROCESS MAP (FLOWCHART) ───────────────── */
 
@@ -966,73 +1027,6 @@ function BehindTheOperations() {
   return (
     <div className="mx-auto max-w-4xl">
       <Carousel slides={behindOperationsSlides} />
-
-      <div className="mt-10 flex justify-center">
-        <Dialog>
-          <DialogTrigger asChild>
-            <button
-              type="button"
-              className="group inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card/60 px-5 py-3 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-card"
-            >
-              <Waypoints className="size-4 text-primary" />
-              View the full process map
-              <ArrowRight className="size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
-            </button>
-          </DialogTrigger>
-          <DialogContent className="flex max-h-[85vh] w-[95vw] max-w-3xl flex-col gap-0 p-0 sm:rounded-2xl">
-            <DialogHeader className="shrink-0 border-b border-border/60 px-6 py-5 text-center sm:text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                Full process map
-              </p>
-              <DialogTitle className="mt-1 text-xl tracking-tight md:text-2xl">
-                Every stage, every branch, every human decision point
-              </DialogTitle>
-              <DialogDescription className="mx-auto max-w-md">
-                From a stranger filling out a form to a closed, onboarded client, drawn as an actual
-                flowchart, not a slideshow.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
-              <ProcessMapFlowchart />
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="mt-10 rounded-xl border border-border/60 bg-card/40 p-6">
-        <h4 className="text-base font-semibold tracking-tight">Why this many workflows?</h4>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Each stage runs as its own dedicated workflow on purpose, since small,
-          single-responsibility pieces are easier to build, test, and review individually. Every
-          workflow here went through a manual, node-by-node review before going live, and carries
-          its own execution log and Slack alerting, so a failure anywhere is caught and traceable
-          immediately instead of buried inside one giant, unreadable pipeline.
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          That's a deliberate tradeoff for reliability and safe iteration while proving the system
-          out, not the smallest possible footprint. For a leaner deployment, several of these could
-          reasonably be consolidated: folding the shared sub-workflows into their callers, or
-          combining the infrastructure jobs into one scheduled workflow. That's an option on the
-          table for your build, not a constraint of the approach.
-        </p>
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-2">
-        {techStack.map((t) => (
-          <span
-            key={t}
-            className="rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 text-xs text-foreground/80"
-          >
-            {t}
-          </span>
-        ))}
-      </div>
-
-      <p className="mt-8 rounded-xl border border-primary/20 bg-primary/[0.05] p-4 text-sm leading-relaxed text-muted-foreground">
-        <strong className="text-foreground">Verification, not vibes:</strong> every one of these
-        workflows was proven against a real, live execution, not just a passing validation check,
-        before I called it done.
-      </p>
     </div>
   );
 }
@@ -1099,6 +1093,106 @@ function PaymentOnboardingKickoff() {
       align="center"
     >
       <Carousel slides={paymentOnboardingSlides} />
+    </Section>
+  );
+}
+
+function ProcessMapDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="group inline-flex items-center gap-2 rounded-xl border border-border/70 bg-card/60 px-5 py-3 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-card"
+        >
+          <Waypoints className="size-4 text-primary" />
+          View the full process map
+          <ArrowRight className="size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[85vh] w-[95vw] max-w-3xl flex-col gap-0 p-0 sm:rounded-2xl">
+        <DialogHeader className="shrink-0 border-b border-border/60 px-6 py-5 text-center sm:text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            Full process map
+          </p>
+          <DialogTitle className="mt-1 text-xl tracking-tight md:text-2xl">
+            Every stage, every branch, every human decision point
+          </DialogTitle>
+          <DialogDescription className="mx-auto max-w-md">
+            From a stranger filling out a form to a closed, onboarded client, drawn as an actual
+            flowchart, not a slideshow.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
+          <ProcessMapFlowchart />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function OperationsProof() {
+  return (
+    <section className="relative py-20 lg:py-28">
+      <Container>
+        <div className="mx-auto max-w-4xl">
+          <div className="mt-10 rounded-xl border border-border/60 bg-card/40 p-6">
+            <h4 className="text-base font-semibold tracking-tight">Why this many workflows?</h4>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Each stage runs as its own dedicated workflow on purpose, since small,
+              single-responsibility pieces are easier to build, test, and review individually. Every
+              workflow here went through a manual, node-by-node review before going live, and carries
+              its own execution log and Slack alerting, so a failure anywhere is caught and traceable
+              immediately instead of buried inside one giant, unreadable pipeline.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              That's a deliberate tradeoff for reliability and safe iteration while proving the system
+              out, not the smallest possible footprint. For a leaner deployment, several of these could
+              reasonably be consolidated: folding the shared sub-workflows into their callers, or
+              combining the infrastructure jobs into one scheduled workflow. That's an option on the
+              table for your build, not a constraint of the approach.
+            </p>
+          </div>
+
+          <p className="mt-8 rounded-xl border border-primary/20 bg-primary/[0.05] p-4 text-sm leading-relaxed text-muted-foreground">
+            <strong className="text-foreground">Verification, not vibes:</strong> every one of these
+            workflows was proven against a real, live execution, not just a passing validation check,
+            before I called it done.
+          </p>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ─────────────────────────── TECH STACK ─────────────────────────── */
+
+function TechStackSection() {
+  return (
+    <Section
+      id="stack"
+      title={
+        <>
+          Built on <span className="text-gradient-crimson">boring, replaceable parts.</span>
+        </>
+      }
+      subtitle="Nothing here is exotic. Each piece does one job and can be swapped for whatever a business already runs, which is the point: the architecture should outlive any single vendor in it."
+      align="center"
+    >
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {techStack.map((t) => (
+          <div
+            key={t.name}
+            className="flex flex-col rounded-2xl border border-border/70 bg-card/60 p-6 transition-colors hover:border-primary/35"
+          >
+            <div className="text-[10px] font-medium tracking-wider text-primary uppercase">
+              {t.role}
+            </div>
+            <h3 className="mt-2 text-base font-semibold tracking-tight">{t.name}</h3>
+            <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{t.detail}</p>
+          </div>
+        ))}
+      </div>
     </Section>
   );
 }

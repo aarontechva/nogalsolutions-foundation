@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiEmailEnquiryTriageRouteImport } from './routes/ai-email-enquiry-triage'
 import { Route as ConsultantEngagementPipelineRouteImport } from './routes/consultant-engagement-pipeline'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiEmailEnquiryTriageRoute = AiEmailEnquiryTriageRouteImport.update({
+  id: '/ai-email-enquiry-triage',
+  path: '/ai-email-enquiry-triage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsultantEngagementPipelineRoute =
@@ -26,27 +32,36 @@ const ConsultantEngagementPipelineRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-email-enquiry-triage': typeof AiEmailEnquiryTriageRoute
   '/consultant-engagement-pipeline': typeof ConsultantEngagementPipelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-email-enquiry-triage': typeof AiEmailEnquiryTriageRoute
   '/consultant-engagement-pipeline': typeof ConsultantEngagementPipelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-email-enquiry-triage': typeof AiEmailEnquiryTriageRoute
   '/consultant-engagement-pipeline': typeof ConsultantEngagementPipelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/consultant-engagement-pipeline'
+  fullPaths:
+    '/' | '/ai-email-enquiry-triage' | '/consultant-engagement-pipeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/consultant-engagement-pipeline'
-  id: '__root__' | '/' | '/consultant-engagement-pipeline'
+  to: '/' | '/ai-email-enquiry-triage' | '/consultant-engagement-pipeline'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-email-enquiry-triage'
+    | '/consultant-engagement-pipeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiEmailEnquiryTriageRoute: typeof AiEmailEnquiryTriageRoute
   ConsultantEngagementPipelineRoute: typeof ConsultantEngagementPipelineRoute
 }
 
@@ -57,6 +72,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-email-enquiry-triage': {
+      id: '/ai-email-enquiry-triage'
+      path: '/ai-email-enquiry-triage'
+      fullPath: '/ai-email-enquiry-triage'
+      preLoaderRoute: typeof AiEmailEnquiryTriageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/consultant-engagement-pipeline': {
@@ -71,6 +93,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiEmailEnquiryTriageRoute: AiEmailEnquiryTriageRoute,
   ConsultantEngagementPipelineRoute: ConsultantEngagementPipelineRoute,
 }
 export const routeTree = rootRouteImport

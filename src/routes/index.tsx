@@ -94,12 +94,25 @@ function Hero() {
       />
 
       <Container>
-        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+        {/* Uneven columns rather than 50/50. At an even split the portrait rendered
+            about the same visual weight as the H1 and won the first look, which is
+            backwards: the headline is the pitch, the portrait is support. The text
+            column now takes ~1.4x the width and the portrait is capped below its
+            column so it reads as a supporting element, not a co-headline. */}
+        <div className="grid items-center gap-14 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
           {/* Left */}
           <div className="max-w-2xl">
+            {/* Explicit break after "hours" so the second line starts on "on",
+                per Aaron's call. Only from md up: below that the line does not fit
+                at this type size anyway, so forcing it there would just create a
+                ragged short line on top of a natural wrap. text-balance is kept:
+                it does not fight the forced break, and without it the remainder
+                broke as "on repetitive / business / operations." with two words
+                stranded on their own lines. */}
             <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl">
-              Stop wasting hours on{" "}
-              <span className="text-gradient-crimson">repetitive business operations.</span>
+              Stop wasting hours
+              <br className="hidden md:inline" />{" "}
+                on <span className="text-gradient-crimson">repetitive business<br className="hidden lg:inline" />{" "}tasks.</span>
             </h1>
 
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
@@ -138,8 +151,10 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right — portrait */}
-          <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+          {/* Right — portrait. Capped and pushed to the outer edge so it sits beside
+              the headline rather than competing with it. The 4:5 ratio is unchanged,
+              so this is a scale change only, not a recrop. */}
+          <div className="relative mx-auto w-full max-w-sm lg:mr-0 lg:ml-auto lg:max-w-[380px] xl:max-w-[420px]">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border/80 shadow-elegant">
               <div
                 aria-hidden
@@ -221,19 +236,125 @@ function FeatureCard({ icon: Icon, title, body }: FeatureCardProps) {
 // Deliberately not FeatureCard. Problems read better as an editorial list than as
 // bordered boxes, and it keeps this section visually distinct from My Edge / Proof of
 // Work, which do use the card grid.
+/**
+ * The section's own headline calls these a "hidden tax," so the design commits to
+ * that: each challenge is a cost card with a small built symptom animation above
+ * it, and a "paid in" line underneath naming what the business actually spends.
+ *
+ * Deliberately unlike Solutions (header beside a cycling phone) and unlike My
+ * Edge / Proof of Work (plain card grid) — the visuals here are drawn in CSS and
+ * SVG, not screenshots, because these are the states BEFORE any system exists to
+ * photograph.
+ *
+ * No hour figures anywhere. The cost lines are qualitative on purpose: a made-up
+ * "12 hrs/week" would be the one unverifiable number on a site that otherwise
+ * only publishes figures pulled from real executions.
+ */
+function ChallengeVisual({ kind }: { kind: "manual" | "silo" | "scale" }) {
+  if (kind === "manual") {
+    // Identical rows lit by a repeating sweep: the same work, done again.
+    return (
+      <div className="flex h-full flex-col justify-center gap-2 px-5">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span
+              className="ch-sweep size-1.5 shrink-0 rounded-full bg-primary/70"
+              style={{ animationDelay: `${i * 0.45}s` }}
+            />
+            <span
+              className="ch-sweep h-1.5 flex-1 rounded-full bg-foreground/15"
+              style={{ animationDelay: `${i * 0.45}s` }}
+            />
+            <span
+              className="ch-sweep h-1.5 w-6 shrink-0 rounded-full bg-foreground/10"
+              style={{ animationDelay: `${i * 0.45}s` }}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (kind === "silo") {
+    // Four systems, every connector severed at the midpoint. The gap is the point.
+    return (
+      <svg viewBox="0 0 200 96" className="h-full w-full" role="presentation">
+        {[
+          [34, 26],
+          [166, 26],
+          [34, 70],
+          [166, 70],
+        ].map(([x, y], i) => (
+          <rect
+            key={i}
+            x={x - 17}
+            y={y - 13}
+            width="34"
+            height="26"
+            rx="7"
+            className="fill-card stroke-border"
+            strokeWidth="1.5"
+          />
+        ))}
+        {["51,26 84,26", "116,26 149,26", "51,70 84,70", "116,70 149,70", "34,39 34,57", "166,39 166,57"].map(
+          (pts, i) => (
+            <polyline
+              key={i}
+              points={pts}
+              className="stroke-primary/45"
+              strokeWidth="1.5"
+              strokeDasharray="3 4"
+              fill="none"
+            />
+          ),
+        )}
+        <g className="ch-flicker">
+          <line x1="93" y1="20" x2="107" y2="32" className="stroke-primary" strokeWidth="2" strokeLinecap="round" />
+          <line x1="107" y1="20" x2="93" y2="32" className="stroke-primary" strokeWidth="2" strokeLinecap="round" />
+        </g>
+      </svg>
+    );
+  }
+
+  // Volume arriving faster than the process clears it, breaching the capacity line.
+  return (
+    <div className="relative flex h-full items-end justify-center gap-1.5 px-6 pb-6">
+      <div aria-hidden className="absolute inset-x-5 bottom-[46px] border-t border-dashed border-primary/50" />
+      {[38, 46, 34, 58, 50, 70, 62, 84].map((h, i) => (
+        <span
+          key={i}
+          className="ch-rise w-3.5 rounded-t-sm"
+          style={{
+            height: `${h}%`,
+            animationDelay: `${i * 0.12}s`,
+            background:
+              h > 52 ? "var(--primary)" : "color-mix(in oklab, var(--foreground) 16%, transparent)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function Challenges() {
-  const items = [
+  const items: { title: string; body: string; cost: string; kind: "manual" | "silo" | "scale" }[] = [
     {
       title: "Too much manual work?",
       body: "Your team spends hours every week on copy-paste tasks, follow-ups, and admin that should run on their own. That's revenue trapped inside repetition.",
+      cost: "Paid weekly, in hours nobody bills for",
+      kind: "manual",
     },
     {
       title: "Disconnected business systems?",
       body: "Your CRM, billing, calendar, and ops tools don't talk to each other. Data lives in silos and your team becomes the integration layer.",
+      cost: "Paid in rekeyed data and quiet mistakes",
+      kind: "silo",
     },
     {
       title: "Operations can't keep up?",
       body: "Growth exposes the cracks. Processes that worked at 10 clients break at 100. Scaling shouldn't mean hiring more people to fix the same problems.",
+      cost: "Paid in headcount, to stand still",
+      kind: "scale",
     },
   ];
   const { ref, inView } = useInView<HTMLUListElement>();
@@ -249,25 +370,58 @@ function Challenges() {
       }
       subtitle="Growing businesses shouldn't be slowed down by repetitive work, disconnected software, or operations that can't keep pace."
     >
-      <ul ref={ref} className="border-t border-border/60">
+      <style>{`
+        @keyframes ch-sweep { 0%,100% { opacity:.35 } 45% { opacity:1 } }
+        @keyframes ch-flicker { 0%,72%,100% { opacity:.25 } 80%,92% { opacity:1 } }
+        @keyframes ch-rise { 0% { transform:scaleY(.35) } 55%,100% { transform:scaleY(1) } }
+        .ch-sweep { animation: ch-sweep 2.6s ease-in-out infinite }
+        .ch-flicker { animation: ch-flicker 3.4s ease-in-out infinite }
+        .ch-rise { transform-origin: bottom; animation: ch-rise 2.9s cubic-bezier(.16,1,.3,1) infinite }
+        @media (prefers-reduced-motion: reduce) {
+          .ch-sweep, .ch-flicker, .ch-rise { animation: none }
+          .ch-rise { transform: none }
+        }
+      `}</style>
+
+      <ul ref={ref} className="grid gap-5 md:grid-cols-3">
         {items.map((item, i) => (
           <li
             key={item.title}
             className={cn(
-              "reveal group grid items-baseline gap-x-8 gap-y-3 border-b border-border/60 py-9 transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:grid-cols-[4.5rem_minmax(0,0.85fr)_minmax(0,1.15fr)] md:py-11 motion-reduce:transition-none",
-              inView ? "translate-x-0" : "-translate-x-12",
+              "reveal group relative flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/60 transition-[transform,opacity,border-color,box-shadow] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/40 hover:shadow-elegant motion-reduce:transition-none",
+              inView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0",
             )}
-            style={{ transitionDelay: inView ? `${i * 120}ms` : "0ms" }}
+            style={{ transitionDelay: inView ? `${i * 130}ms` : "0ms" }}
           >
-            <span className="font-mono text-3xl leading-none font-semibold text-muted-foreground/30 transition-colors duration-300 group-hover:text-primary md:text-4xl">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h3 className="text-2xl font-semibold tracking-tight text-balance md:text-[1.75rem]">
-              {item.title}
-            </h3>
-            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-              {item.body}
-            </p>
+            {/* Symptom panel — the visual argument, before any words */}
+            <div className="relative h-32 border-b border-border/60 bg-secondary/25">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-50"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 60% 80% at 50% 100%, oklch(0.45 0.18 18 / 0.12), transparent 70%)",
+                }}
+              />
+              <div className="relative h-full">
+                <ChallengeVisual kind={item.kind} />
+              </div>
+              <span className="absolute top-3 left-4 font-mono text-xs text-muted-foreground/50">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+
+            <div className="flex flex-1 flex-col p-7">
+              <h3 className="text-xl font-semibold tracking-tight text-balance md:text-[1.35rem]">
+                {item.title}
+              </h3>
+              <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-muted-foreground">
+                {item.body}
+              </p>
+              <p className="mt-6 border-t border-border/60 pt-4 text-xs font-medium tracking-wide text-primary/90">
+                {item.cost}
+              </p>
+            </div>
           </li>
         ))}
       </ul>
@@ -906,7 +1060,7 @@ function Process() {
 function TechStack() {
   const groups = [
     { icon: Workflow, name: "Workflow Automation", tools: ["n8n", "Zapier", "Make", "Webhooks"] },
-    { icon: Layers, name: "CRM Ecosystems", tools: ["GoHighLevel", "HubSpot", "Custom CRM"] },
+    { icon: Layers, name: "CRM Ecosystems", tools: ["GoHighLevel", "HubSpot"] },
     { icon: Bot, name: "AI Platforms", tools: ["OpenAI", "Claude", "AI Agents", "RAG", "MCP"] },
     { icon: Plug, name: "Backend Integrations", tools: ["REST APIs", "OAuth", "HTTP"] },
     {
@@ -1185,6 +1339,30 @@ function WhyChoose() {
 // real to show, so it gets a large panel with actual stats. The two unbuilt items are
 // demoted to a compact stub list instead of matching it box-for-box with an empty
 // dashed placeholder standing in for content that doesn't exist yet.
+/**
+ * Collage of real workflow canvases behind the Live Systems section.
+ *
+ * Six different builds rather than one, because the claim this section makes is
+ * breadth ("18 automated workflows"), and a single canvas repeated at low opacity
+ * argues for exactly one.
+ *
+ * Opacity is theme-split and the light value is NOT just a lower dark value. These
+ * canvases are dark artwork: on a light page the same treatment either disappears
+ * or turns grey and muddy. Light mode therefore gets more opacity, partial
+ * desaturation so the phase-group colours stop competing with the crimson brand,
+ * and a slightly stronger tile border so the composition still reads as a collage
+ * rather than a smudge.
+ */
+const BO = "/case-study/collage/";
+const liveSystemsCollage: { src: string; left: string; top: string; w: string; rot: number }[] = [
+  { src: BO + "NogalSolutions-BW7-Sequenced-Generation-Prompts-B1-B7-Modular.png", left: "-8%", top: "2%", w: "40%", rot: -5 },
+  { src: BO + "NogalSolutions-BW3-Qualified-Handoff.png", left: "27%", top: "-10%", w: "32%", rot: 4 },
+  { src: BO + "NogalSolutions-BW8-Revision-Wrapper.png", left: "60%", top: "0%", w: "42%", rot: -3 },
+  { src: BO + "NogalSolutions-BW5-Recording-Watcher-Transcription.png", left: "-4%", top: "56%", w: "36%", rot: 5 },
+  { src: BO + "NogalSolutions-Record-Deposit-Payment.png", left: "31%", top: "66%", w: "34%", rot: -4 },
+  { src: BO + "NogalSolutions-Shared-Advance-Deal-Stage.png", left: "66%", top: "58%", w: "38%", rot: 6 },
+];
+
 function ProofOfWork() {
   const soon = [
     {
@@ -1211,8 +1389,46 @@ function ProofOfWork() {
       }
       subtitle="A closer look at production systems engineered for live business operations."
     >
+      {/* Real workflow canvases as the backdrop rather than another abstract
+          gradient: this section is the one place on the page making a concrete
+          claim, so the texture behind it is the actual work. See the manifest
+          above for why the light and dark treatments differ by more than opacity. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.11] [filter:saturate(0.35)] dark:opacity-[0.18] dark:[filter:none]"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 78% 68% at 52% 46%, black 12%, transparent 74%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 78% 68% at 52% 46%, black 12%, transparent 74%)",
+          }}
+        >
+          {liveSystemsCollage.map((tile) => (
+            <img
+              key={tile.src}
+              src={encodeURI(tile.src)}
+              alt=""
+              // Eager on purpose. These are right-sized copies of the canvases
+              // (800px wide, palettised): 111KB for all six, down from 659KB at
+              // full size, which is lighter than one original was. That removes any
+              // reason to depend on lazy-loading, which this codebase has already
+              // been bitten by once when it silently produced blank images.
+              decoding="async"
+              className="absolute rounded-lg border border-foreground/25 object-cover shadow-2xl dark:border-foreground/10"
+              style={{
+                left: tile.left,
+                top: tile.top,
+                width: tile.w,
+                transform: `rotate(${tile.rot}deg)`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
       <div
         ref={ref}
+        style={{ position: "relative" }}
         className={cn(
           "reveal grid gap-6 transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none lg:grid-cols-[1.6fr_1fr]",
           inView ? "translate-y-0" : "translate-y-12",
@@ -1303,6 +1519,31 @@ function ProofOfWork() {
               <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
             </div>
           </a>
+
+          {/* Third real system — standalone, not part of the CEP */}
+          <Link
+            to="/ai-email-enquiry-triage"
+            className="group relative overflow-hidden rounded-2xl border border-primary/25 bg-card/60 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/45"
+          >
+            <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium tracking-wider text-primary uppercase">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+              </span>
+              Live System
+            </div>
+            <h4 className="mt-2.5 text-base font-semibold tracking-tight">
+              AI Email Enquiry Triage
+            </h4>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Reads every customer email, checks live stock and calendar data, answers the safe
+              questions itself, and hands the rest over already summarised.
+            </p>
+            <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
+              See how it works
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </Link>
 
           {/* Not built yet — small stubs, not full cards competing with the real thing */}
           {soon.map((p) => (
