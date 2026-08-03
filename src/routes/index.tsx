@@ -1343,7 +1343,7 @@ function WhyChoose() {
  * Collage of real workflow canvases behind the Live Systems section.
  *
  * Six different builds rather than one, because the claim this section makes is
- * breadth ("18 automated workflows"), and a single canvas repeated at low opacity
+ * breadth ("23 automated workflows"), and a single canvas repeated at low opacity
  * argues for exactly one.
  *
  * Opacity is theme-split and the light value is NOT just a lower dark value. These
@@ -1371,7 +1371,7 @@ function ProofOfWork() {
     },
   ];
   const stats = [
-    { v: "18", l: "automated workflows" },
+    { v: "23", l: "automated workflows" },
     { v: "< 10 min", l: "to generate all 7 deliverables" },
     { v: "3 - 5 days", l: "of manual work eliminated" },
     { v: "2", l: "human review gates" },

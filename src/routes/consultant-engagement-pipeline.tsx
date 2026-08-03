@@ -36,7 +36,7 @@ export const Route = createFileRoute("/consultant-engagement-pipeline")({
       {
         name: "description",
         content:
-          "The 18-workflow automation system running NogalSolutions' own consulting practice end-to-end, from intake to a client-ready deliverable, live and proven in production.",
+          "The 23-workflow automation system running NogalSolutions' own consulting practice end-to-end, from intake to a client-ready deliverable, live and proven in production.",
       },
       {
         property: "og:title",
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/consultant-engagement-pipeline")({
       {
         property: "og:description",
         content:
-          "See how NogalSolutions automated its own consulting operations: 18 workflows, two human review gates, and all 7 client deliverables generated in under 10 minutes.",
+          "See how NogalSolutions automated its own consulting operations: 23 workflows, two human review gates, and all 7 client deliverables generated in under 10 minutes.",
       },
     ],
   }),
@@ -71,7 +71,7 @@ function ConsultantEngagementPipeline() {
 /* ─────────────────────────── HERO ─────────────────────────── */
 
 const heroStats = [
-  { v: "18", l: "automated workflows" },
+  { v: "23", l: "automated workflows" },
   { v: "< 10 min", l: "to generate all 7 deliverables" },
   { v: "3 - 5 days", l: "of manual work eliminated" },
   { v: "2", l: "human review gates, by design" },
@@ -652,7 +652,7 @@ function ProcessMapFlowchart() {
 
       <div className="mb-8 grid grid-cols-2 gap-1 overflow-hidden rounded-xl border border-border/60 sm:grid-cols-4">
         {[
-          { v: "18", l: "automated workflows" },
+          { v: "23", l: "automated workflows" },
           { v: "<10 min", l: "to draft all 7 deliverables" },
           { v: "5", l: "human decision points" },
           { v: "2", l: "formal HubSpot review gates" },
