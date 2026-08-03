@@ -1,8 +1,8 @@
 # NogalSolutions Showcase Systems Spec
 
-**Version 1.0 (DRAFT, awaiting Aaron's acceptance)**
+**Version 1.0, ACCEPTED by Aaron 2026-08-04**
 **Canonical format: markdown-native, this file. There is no docx original.**
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
 ---
 
@@ -257,7 +257,9 @@ Predates this spec and the showcase programme; retained and governed here becaus
 
 ### 7.4 HVAC Service Operations Coordinator
 
-**Status: PLANNED. Not built. Design not yet accepted.**
+**Status: SELECTED as the next build (Aaron, 2026-08-04). Not built.**
+
+Chosen over Vendor Invoice Processing. Aaron's stated reason: building for one specific target business, so the showcase compounds on ClimateWorks HVAC rather than spreading across unrelated demos. Vendor Invoice Processing is not cancelled, it is deferred; its architecture is recorded in `docs/progress.md` (Save-State 171) and is not lost.
 
 **Origin.** Codex researched recurring operational pain across HVAC, healthcare clinics, real estate, and solar, and recommended HVAC first on the combination of urgent pain, SMB accessibility, measurable ROI, and low regulatory risk. Solar ranked second (document-heavy, strong automation potential), real estate third (crowded, contract and fair-housing sensitivity), healthcare fourth (large pain, but only behind a HIPAA-ready architecture with BAAs, access controls, and audit logging).
 
@@ -280,9 +282,9 @@ Inbound service request
 
 Explicitly deferred to a documented phase 2: technician-note parsing, estimate drafting, unpaid-invoice follow-up, and the daily at-risk-jobs summary.
 
-**Open conflict, for Aaron's decision.** This competes with Vendor Invoice Processing, previously chosen as the next system. They are not complementary: "Lead-to-Job-to-Cash" includes estimate and invoice follow-up. One or the other.
+**Unverified, blocking publication (§8).** Every statistic in the source research (BLS and ACCA on HVAC employment, CAQH and AMA on prior authorization, NAR on real estate technology, DOE and NREL on solar soft costs) is recorded as cited but **has not been independently checked**. None may appear on a public page until verified against the actual source. This blocks publishing an HVAC page, not building the system.
 
-**Unverified, blocking publication (§8).** Every statistic in the source research (BLS and ACCA on HVAC employment, CAQH and AMA on prior authorization, NAR on real estate technology, DOE and NREL on solar soft costs) is recorded as cited but **has not been independently checked**. None may appear on a public page until verified against the actual source.
+**Open before building:** Aaron's confirmation of the phase-1 scope above, and the §5 autonomy-gate boundary for this system (which steps, if any, may act without dispatcher approval). Everything through job creation is currently specified as human-approved.
 
 ---
 
@@ -357,19 +359,56 @@ Inherited from the CEP unchanged, because it is what makes any claim here trustw
 
 | Version | Date | Change |
 |---|---|---|
-| 1.0 | 2026-08-03 | Initial version. Establishes the Showcase Systems project as distinct from the CEP; documents §7.1 to §7.3 retroactively (decisions that still bind, not node-by-node history); records the §3 platform constraints established by live failures across 2026-07-28 to 2026-08-01; adds §7.4 as the first forward-looking entry, unbuilt and unaccepted. |
+| 1.0 | 2026-08-03 | Initial version drafted. Establishes the Showcase Systems project as distinct from the CEP; documents §7.1 to §7.3 retroactively (decisions that still bind, not node-by-node history); records the §3 platform constraints established by live failures across 2026-07-28 to 2026-08-01; adds §7.4 as the first forward-looking entry. |
+| 1.0 | 2026-08-04 | **Accepted by Aaron.** §7.4 selected as the next build over Vendor Invoice Processing. §8.2's worked example updated after the published workflow count was corrected from 18 to 23 (commit `9f872fe`). |
 
 ---
 
-## Appendix B: Open items
+## Appendix B: Carried risks and open items
+
+Every item here is deliberately carried, not forgotten. An item leaves this table only by being resolved or explicitly dropped, never by going unmentioned. Items marked with a carry count have survived multiple audits and are due a decision rather than another carry.
+
+### Open decisions (Aaron's)
+
+| Item | Detail |
+|---|---|
+| §7.4 phase-1 scope | Bounded slice recommended (request through job creation). Awaiting confirmation before build. |
+| §7.4 autonomy boundary | Which steps, if any, may act without dispatcher approval. Currently specified as fully human-approved. |
+| `PROMPT_A_MAX_TOKENS` docx value | Spec §11 and Prompt Library §3.3 still document the old 4096 default; live value is correct at 16000. **Carried across 4 audits.** Fix or drop. |
+| Roadmap `revision_loops` mention | Stale reference. **Carried across 4 audits.** Fix or drop. |
+
+### Unproven (built, never exercised live)
+
+| Item | Risk if it stays unproven |
+|---|---|
+| Simple Triage engine (§7.1, `requiresLookup: false`) | The reusable template's other half is unverified. Any client onboarded onto the simple path would be running untested code. |
+| Option B `needsHumanFollowUp` (§7.1) | The distinction between "resolved" and "acknowledged, needs follow-up" has never been produced by a real run. |
+
+### Known limits (understood, accepted, not defects)
 
 | Item | Status |
 |---|---|
-| HVAC (§7.4) versus Vendor Invoice Processing | Aaron's decision, unresolved |
-| §7.4 phase-1 scope | Recommended, awaiting confirmation |
-| Third-party statistics in §7.4 | Unverified, blocks publication |
-| Whole-dataset prompt injection scaling limit (§3.1) | Known, RAG showcase is the fix |
-| Simple Triage engine (§7.1) | Built, never fired live |
-| Option B `needsHumanFollowUp` (§7.1) | Built, never fired live |
-| `www.nogalsolutions.tech` | Returns 522, needs a Pages custom-domain binding |
-| Site-wide meta description | Still reads "operations" while the hero reads "tasks" |
+| Whole-dataset prompt injection (§3.1) | Fine at demo scale (6 to 10 rows). Degrades on cost, latency, and accuracy at 1,000+. The RAG showcase on the roadmap is the real fix. |
+| FAQ match score variance (§7.1) | `Check FAQ Match` embeds an AI-generated summary whose wording varies run to run, which can move the score across the 0.75 boundary. Aaron's explicit call: leave the threshold alone, a human handles the complaint either way. |
+| No genuine tool-calling (§3.1) | Structural on this instance, not a bug awaiting a patch. `N8N_RUNNERS_ENABLED=false` is an untested hypothesis that would target only one of the two bugs and carries production-wide blast radius. Not recommended. |
+
+### Blocking publication only
+
+| Item | Detail |
+|---|---|
+| §7.4 third-party statistics | BLS, ACCA, CAQH, AMA, NAR, DOE, NREL figures are cited but unverified. Must be checked against the actual sources before appearing on any page (§8.2). Does not block building. |
+
+### Infrastructure
+
+| Item | Detail |
+|---|---|
+| `www.nogalsolutions.tech` | Returns HTTP 522; not configured as a Pages custom domain. Apex domain is fine, so this is cosmetic. Requires a Cloudflare dashboard action by Aaron, not a code change. |
+
+### Resolved since v1.0 drafting
+
+| Item | Resolution |
+|---|---|
+| §7.4 versus Vendor Invoice Processing | HVAC selected 2026-08-04. Invoice deferred, architecture preserved in `docs/progress.md`. |
+| Published workflow count | Corrected 18 to 23, commit `9f872fe`, confirmed live. |
+| Site-wide meta description | Corrected "operations" to "tasks" 2026-08-04, matching the hero. |
+| Personal email in showcase screenshots | Redacted with solid bars, verified byte-for-byte against the live CDN copy (Hindsight 177). |

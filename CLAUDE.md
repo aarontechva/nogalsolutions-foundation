@@ -139,7 +139,9 @@ Standalone n8n workflows built to demonstrate capability to prospective clients,
 
 ## B.2 Current locked version
 
-**Showcase Spec v1.0**, 2026-08-03. **DRAFT, awaiting Aaron's acceptance.**
+**Showcase Spec v1.0**, accepted by Aaron 2026-08-04. Carried risks and open items live in that document's Appendix B, which is the single place they are tracked.
+
+**Next build: §7.4 HVAC Service Operations Coordinator**, selected over Vendor Invoice Processing. Not started.
 
 ## B.3 The things most likely to bite you
 
