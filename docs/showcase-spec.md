@@ -200,7 +200,7 @@ Rationale: stating a price or an open appointment slot is reporting a fact. Quot
 | `csa_hvac_faq` | Knowledge base, 6 seeded rows, pgvector |
 | `csa_complaint_log` | Complaint audit log |
 | Inventory sheet | Google Sheets `105pGcj3FRdjcZNWxQIe-k3_3YQjG9bK6KAm8d5Kcstw`, tab "Inventory", with a `Price` column and one deliberately zero-stock part |
-| Appointment slots sheet | Synthetic availability (n8n has no node to query real Calendly availability, only a booking-event trigger) |
+| Appointment slots sheet | Synthetic availability (n8n has no node to query real Calendly availability, only a booking-event trigger). Columns confirmed live 2026-08-04 via a disposable diagnostic workflow: `Date`, `Time Slot`, `Status` (values seen: `Open`, `Booked`). 8 rows at time of check. |
 | Slack | `#customer-support-tickets` (`C0BM5P4LU2U`), `#failure-alert` |
 | Inbound email | `aaron@nogalsolutions.tech` via Resend inbound (MX verified), Full-access credential `NogalSolutions-Util AI CSA HVAC` (`gwZZxXSEI34BgHHz`) |
 
@@ -410,5 +410,7 @@ Every item here is deliberately carried, not forgotten. An item leaves this tabl
 |---|---|
 | §7.4 versus Vendor Invoice Processing | HVAC selected 2026-08-04. Invoice deferred, architecture preserved in `docs/progress.md`. |
 | Published workflow count | Corrected 18 to 23, commit `9f872fe`, confirmed live. |
-| Site-wide meta description | Corrected "operations" to "tasks" 2026-08-04, matching the hero. |
+| Site-wide meta description | Closed 2026-08-04, but **the original flag rested on a false premise**. It was recorded as "disagrees with the page it describes"; in fact all three content routes (`index`, `consultant-engagement-pipeline`, `ai-email-enquiry-triage`) define their own `description`, so `__root.tsx`'s value is overridden everywhere and is never served. It was changed from "operations" to "tasks" anyway, since it remains the fallback for any future route, but no page's served metadata changed. Verified by fetching all three live pages. Lesson: a claim about published metadata is only verified by reading what the server actually returns, not by reading the source file that appears to set it. |
 | Personal email in showcase screenshots | Redacted with solid bars, verified byte-for-byte against the live CDN copy (Hindsight 177). |
+| `service_role` grant on `hvac_jobs` | Confirmed live 2026-08-04 via a disposable diagnostic workflow (insert, read back, delete), not a raw SQL grant check. Deliberately tested the credential path, not just the Postgres permission: this project's Resend send-only-vs-full-access split showed those can differ. Delete's own response echoed the deleted row back by id, confirming genuine round-trip, not an inferred success. Diagnostic workflow deleted after use, no leftover data. |
+| Appointment Slots sheet column names | Confirmed live in the same diagnostic pass: `Date`, `Time Slot`, `Status`. Workflow A's open-slot filter assumption was correct. Recorded in §6. |
