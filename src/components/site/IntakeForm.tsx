@@ -18,6 +18,17 @@ import { Section } from "./Section";
 // ─── EMAIL VALIDATION ─────────────────────────────────────────────────────────
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// ─── SUBMISSION FAILURE FALLBACK ──────────────────────────────────────────────
+// This exists because of a real incident: the Supabase project paused on the free
+// tier (2026-08-04), the hostname stopped resolving, and this form had no visible
+// error state. A prospect submitting during that window would have seen the button
+// return to idle and nothing else, leaving no row, no acknowledgement email, and no
+// trace anywhere that they had ever made contact.
+//
+// The fallback address matters more than the message wording: whatever breaks on the
+// backend, the prospect must still leave with a way to reach a human.
+const FALLBACK_EMAIL = "aaron@nogalsolutions.tech";
+
 // ─── FIELD 4: INDUSTRY — JUDGMENT CALL ───────────────────────────────────────
 // Chose dropdown with "Other" over free text.
 // Rationale: Industry is a bounded categorical signal that feeds the downstream
@@ -169,6 +180,7 @@ export function IntakeForm() {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitFailed, setSubmitFailed] = useState(false);
   const id = useId();
 
   const touch = (field: string) =>
@@ -213,19 +225,28 @@ export function IntakeForm() {
       submitted_at: new Date().toISOString(),
     };
     setIsSubmitting(true);
+    setSubmitFailed(false);
     try {
       const { error } = await supabase.from("intake_submissions").insert({
         payload,
         submitted_at: payload.submitted_at,
       });
 
+      // Supabase returns an error object for handled failures (RLS rejection,
+      // constraint violation, auth problems).
       if (error) {
         console.error("[IntakeForm] Submission failed:", error);
-        // TODO: surface a user-facing error state — not in scope for this pass,
-        // flagging so it doesn't get forgotten before this goes to real users.
+        setSubmitFailed(true);
         return;
       }
       setSubmitted(true);
+    } catch (err) {
+      // Thrown rather than returned: DNS failure (a paused Supabase project does
+      // exactly this), offline client, CORS, or an aborted request. Previously this
+      // had no catch at all, so it escaped as an unhandled rejection and the user
+      // saw the button simply return to idle.
+      console.error("[IntakeForm] Submission threw:", err);
+      setSubmitFailed(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -506,6 +527,39 @@ export function IntakeForm() {
                 </Label>
               </div>
             </div>
+
+            {/* ── SUBMISSION FAILURE ────────────────────────────────────── */}
+            {/* Deliberately does NOT clear the form. Everything the prospect typed
+                stays exactly where it is, so they can retry or copy it into an
+                email without having to write it twice. */}
+            {submitFailed && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="rounded-xl border border-destructive/40 bg-destructive/10 p-5"
+              >
+                <p className="text-sm font-semibold text-destructive">
+                  Your submission did not go through.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Something on our end failed, not anything you did, and nothing was
+                  saved. Your answers are still filled in below, so you can press
+                  Submit again to retry.
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  If it keeps failing, please email{" "}
+                  <a
+                    href={`mailto:${FALLBACK_EMAIL}?subject=${encodeURIComponent(
+                      "Intake form is failing",
+                    )}`}
+                    className="font-medium text-primary underline underline-offset-4"
+                  >
+                    {FALLBACK_EMAIL}
+                  </a>{" "}
+                  directly and I will pick it up from there.
+                </p>
+              </div>
+            )}
 
             {/* ── SUBMIT ────────────────────────────────────────────────── */}
             <div className="flex flex-col items-end gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
